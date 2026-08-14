@@ -1,0 +1,39 @@
+/* 全局基础样式 —— 先保持极简空白，之后设计时再替换 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'PingFang SC',
+    'Microsoft YaHei', sans-serif;
+  background: #ffffff;
+  color: #1a1a1a;
+  line-height: 1.6;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+nav {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+nav a {
+  color: #333;
+  text-decoration: none;
+}
+
+nav a.router-link-active {
+  color: #0070f3;
+  font-weight: 600;
+}
+
+main {
+  padding: 2rem;
+}

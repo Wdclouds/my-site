@@ -1,0 +1,15 @@
+# 依赖
+node_modules/
+dist/
+
+# 环境变量（含密钥，绝不提交 GitHub，本地和生产各一份）
+.env
+.env.*
+!.env.example
+*.local
+
+# 系统/编辑器
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
