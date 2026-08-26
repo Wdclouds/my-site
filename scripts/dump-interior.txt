@@ -1,0 +1,14 @@
+文件: public/car_interior.glb  (1.0 MB)  GLB v2
+节点数=8  mesh数=2  材质数=2  场景数=1
+
+===== 场景: Sketchfab_Scene =====
+▪ Sketchfab_model  [组]
+  ▪ c3ca287bfe384471b0bee1e10599f91e.fbx  [组]
+    ▪ RootNode  [组]
+      ▪ XJ220_3  [组]
+        ▸ XJ220_3_default_0  [mesh]  mat=default  中心(-0.78, 1.21, -0.01)  尺寸(5.20, 2.48, 4.43)
+            min(-3.38, -0.03, -2.22)  max(1.83, 2.45, 2.21)  路径=/Sketchfab_model/c3ca287bfe384471b0bee1e10599f91e.fbx/RootNode/XJ220_3/XJ220_3_default_0
+      ▪ weel  [组]
+        ▪ Object_6  [组]
+          ▸ weel_default_0  [mesh]  mat=default_0  中心(-1.30, 1.27, 0.93)  尺寸(0.48, 0.97, 1.07)
+              min(-1.54, 0.79, 0.40)  max(-1.07, 1.76, 1.47)  路径=/Sketchfab_model/c3ca287bfe384471b0bee1e10599f91e.fbx/RootNode/weel/Object_6/weel_default_0

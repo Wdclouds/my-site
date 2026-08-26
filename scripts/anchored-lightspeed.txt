@@ -1,0 +1,91 @@
+  // ===== 粒子：Lightspeed shader（reactbits 视觉）锚定车面前世界原点 =====
+  // 每帧把 EMITTER 世界坐标投影到屏幕作为 uCenter，warp 从该点向外射出 →
+  // 转头时流光像从车外那个点射出来（世界固定）；深度推到车后 → 车身遮挡、透过车窗可见
+  const EMITTER = new THREE.Vector3(-0.2, 0.55, -2.8)
+  const projV = new THREE.Vector3() // 投影复用，避免每帧 GC
+  const particleUniforms = {
+    iTime: { value: 0 },
+    iResolution: { value: new THREE.Vector2(width * Math.min(window.devicePixelRatio, 1.5), height * Math.min(window.devicePixelRatio, 1.5)) },
+    uCenter: { value: new THREE.Vector2(width * 0.5, height * 0.5) },
+    uSpeed: { value: 0.5 },
+    uIntensity: { value: 1.0 },
+    uOpacity: { value: 1.0 },
+    uColor1: { value: new THREE.Color('#5227FF') },
+    uColor2: { value: new THREE.Color('#FF9FFC') },
+    uColor3: { value: new THREE.Color('#B19EEF') },
+    uStreakCount: { value: 128 },
+    uStretchFactor: { value: 0.05 },
+    uFadePower: { value: 2.0 },
+    uRotation: { value: 0.0 },
+  }
+  const particleVert = `
+    void main() {
+      // 深度推到车体后方 → 车身遮挡、只透过车窗可见
+      gl_Position = vec4(position.xy, 0.985, 1.0);
+    }
+  `
+  const particleFrag = `
+    #define PI 3.14159265359
+    uniform float iTime;
+    uniform vec2 iResolution;
+    uniform vec2 uCenter;
+    uniform vec3 uColor1;
+    uniform vec3 uColor2;
+    uniform vec3 uColor3;
+    uniform float uStreakCount;
+    uniform float uStretchFactor;
+    uniform float uIntensity;
+    uniform float uSpeed;
+    uniform float uRotation;
+    uniform float uFadePower;
+    uniform float uOpacity;
+
+    float computeStreak(vec2 coord, float timeOffset) {
+      coord.x = coord.x * uStreakCount;
+      float horizontalPos = fract(coord.x);
+      float columnIndex = floor(coord.x);
+      coord.y *= uStretchFactor;
+      float randomOffset = sin(columnIndex * 215.4);
+      float speedVariation = cos(columnIndex * 33.1) * 0.3 + 0.7;
+      float dynamicTrail = mix(95.0, 35.0, speedVariation);
+      float animatedY = fract(coord.y + timeOffset * speedVariation + randomOffset);
+      float streakValue = animatedY * dynamicTrail;
+      streakValue = 1.0 / streakValue;
+      streakValue = smoothstep(0.0, 1.0, streakValue * streakValue);
+      streakValue = sin(streakValue * PI) * (speedVariation * 5.0);
+      float horizontalFalloff = sin(horizontalPos * PI);
+      return streakValue * (horizontalFalloff * horizontalFalloff);
+    }
+
+    void main() {
+      // warp 中心 = 车面前世界原点的屏幕投影（每帧更新）→ 世界锚定
+      vec2 uv = (gl_FragCoord.xy - uCenter) / iResolution.y;
+      float distFromCenter = length(uv) + 0.1;
+      float angle = atan(uv.x, uv.y) / PI + uRotation;
+      float radius = 2.5 / distFromCenter;
+      vec2 polarCoord = vec2(angle, radius);
+      float animTime = iTime * 0.4 * uSpeed;
+      vec3 finalColor = vec3(0.0);
+      finalColor += uColor1 * computeStreak(polarCoord, animTime);
+      finalColor += uColor2 * computeStreak(polarCoord, animTime + 0.33);
+      finalColor += uColor3 * computeStreak(polarCoord, animTime + 0.66);
+      finalColor *= uIntensity;
+      float distanceFade = pow(distFromCenter, uFadePower);
+      finalColor *= distanceFade * uOpacity;
+      float alpha = max(max(finalColor.r, finalColor.g), finalColor.b);
+      gl_FragColor = vec4(finalColor, alpha);
+    }
+  `
+  const particleMat = new THREE.ShaderMaterial({
+    uniforms: particleUniforms,
+    vertexShader: particleVert,
+    fragmentShader: particleFrag,
+    transparent: true,
+    blending: THREE.AdditiveBlending,
+    depthTest: true, // 车体遮挡 → 只透过车窗看到
+    depthWrite: false,
+  })
+  const particleMesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), particleMat)
+  particleMesh.renderOrder = 10
+  particleMesh.frustumCulled = false
+  camera.add(particleMesh)

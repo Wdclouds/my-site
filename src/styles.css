@@ -1,8 +1,14 @@
-/* 全局基础样式 —— 先保持极简空白，之后设计时再替换 */
+/* 全局基础样式 */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden; /* 禁止全局滚动条 */
 }
 
 body {
@@ -13,27 +19,14 @@ body {
   line-height: 1.6;
 }
 
+/* 悬浮导航（CardNav）不占文档流，内容区占满全屏 */
 #app {
-  min-height: 100vh;
-}
-
-nav {
-  display: flex;
-  gap: 1.5rem;
-  padding: 1rem 2rem;
-  border-bottom: 1px solid #e5e5e5;
-}
-
-nav a {
-  color: #333;
-  text-decoration: none;
-}
-
-nav a.router-link-active {
-  color: #0070f3;
-  font-weight: 600;
+  height: 100vh;
+  overflow: hidden;
 }
 
 main {
-  padding: 2rem;
+  height: 100%;
+  overflow: hidden;
+  padding: 0;
 }

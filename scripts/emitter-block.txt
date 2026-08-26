@@ -1,0 +1,84 @@
+  // ===== 3D 粒子发射器：车面前世界原点，粒子向外喷射（Points + 顶点 shader，世界固定）=====
+  // 原点在车前方（挡风玻璃外），粒子沿各自方向从原点飞出、到半径后重生
+  // 世界坐标 → 转头粒子留在原地；深度测试 → 车身遮挡、透过车窗可见
+  const EMITTER = new THREE.Vector3(-0.2, 0.55, -2.8)
+  const PARTICLE_COUNT = 900
+  const EMIT_RADIUS = 7
+  const pPos = new Float32Array(PARTICLE_COUNT * 3)
+  const pDir = new Float32Array(PARTICLE_COUNT * 3)
+  const pSeed = new Float32Array(PARTICLE_COUNT)
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    const theta = Math.random() * Math.PI * 2
+    const cosPhi = Math.random() * 0.9 - 0.1 // 前方为主（-z 远离车），带扩散
+    const sinPhi = Math.sqrt(Math.max(0, 1 - cosPhi * cosPhi))
+    pDir[i * 3] = sinPhi * Math.cos(theta)
+    pDir[i * 3 + 1] = sinPhi * Math.sin(theta) * 0.6
+    pDir[i * 3 + 2] = -cosPhi
+    pSeed[i] = Math.random()
+  }
+  const particleGeo = new THREE.BufferGeometry()
+  particleGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3))
+  particleGeo.setAttribute('aDir', new THREE.BufferAttribute(pDir, 3))
+  particleGeo.setAttribute('aSeed', new THREE.BufferAttribute(pSeed, 1))
+  const particleUniforms = {
+    uTime: { value: 0 },
+    uOrigin: { value: EMITTER.clone() },
+    uSpeed: { value: 4.0 },
+    uRadius: { value: EMIT_RADIUS },
+    uSize: { value: 0.045 },
+    uOpacity: { value: 1.0 },
+    uColor1: { value: new THREE.Color('#5227FF') },
+    uColor2: { value: new THREE.Color('#FF9FFC') },
+    uColor3: { value: new THREE.Color('#B19EEF') },
+  }
+  const particleVert = `
+    attribute vec3 aDir;
+    attribute float aSeed;
+    uniform float uTime;
+    uniform vec3 uOrigin;
+    uniform float uSpeed;
+    uniform float uRadius;
+    uniform float uSize;
+    varying float vFade;
+    varying float vMix;
+    void main() {
+      // 每颗粒子从随机相位开始，沿方向匀速外飞，到半径后回绕（连续喷射）
+      float spd = uSpeed * (0.5 + aSeed * 1.0);
+      float dist = mod(uTime * spd + aSeed * uRadius, uRadius);
+      vec3 worldPos = uOrigin + aDir * dist;
+      vFade = 1.0 - dist / uRadius; // 离原点越远越淡（拖尾朝原点）
+      vMix = aSeed;
+      vec4 mv = modelViewMatrix * vec4(worldPos, 1.0);
+      gl_PointSize = uSize * 320.0 / max(0.1, -mv.z);
+      gl_Position = projectionMatrix * mv;
+    }
+  `
+  const particleFrag = `
+    uniform vec3 uColor1;
+    uniform vec3 uColor2;
+    uniform vec3 uColor3;
+    uniform float uOpacity;
+    varying float vFade;
+    varying float vMix;
+    void main() {
+      vec2 c = gl_PointCoord - 0.5;
+      float d = length(c);
+      if (d > 0.5) discard;
+      float soft = smoothstep(0.5, 0.0, d);
+      vec3 col = mix(uColor1, uColor2, vMix);
+      col = mix(col, uColor3, fract(vMix * 3.0) * 0.6);
+      gl_FragColor = vec4(col, soft * vFade * uOpacity);
+    }
+  `
+  const particleMat = new THREE.ShaderMaterial({
+    uniforms: particleUniforms,
+    vertexShader: particleVert,
+    fragmentShader: particleFrag,
+    transparent: true,
+    blending: THREE.AdditiveBlending,
+    depthTest: true, // 车体遮挡 → 只透过车窗看到
+    depthWrite: false,
+  })
+  const particlePoints = new THREE.Points(particleGeo, particleMat)
+  particlePoints.renderOrder = 10
+  scene.add(particlePoints)

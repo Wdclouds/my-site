@@ -1,0 +1,17 @@
+.text-scatter {
+  position: relative;
+  display: inline-block;
+  cursor: default;
+  user-select: none;
+}
+
+.text-scatter__letter {
+  display: inline-block;
+  position: relative;
+  white-space: pre;
+}
+
+.text-scatter__space {
+  display: inline-block;
+  white-space: pre;
+}

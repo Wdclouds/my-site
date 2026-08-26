@@ -3,6 +3,8 @@ import { fileURLToPath } from 'url'
 import dotenv from 'dotenv'
 import express from 'express'
 import { connectDB } from './db.js'
+import songsRouter from './routes/songs.js'
+import blogRouter from './blog/blogRoutes.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -15,12 +17,32 @@ dotenv.config({ path: path.resolve(__dirname, '..', envFile) })
 const app = express()
 app.use(express.json())
 
+// 博客 API：/api/posts（SQLite，游标分页）—— 合并自 notion-blog-mvp
+app.use('/api/posts', blogRouter)
+
+// 音乐文件静态托管：server/public/music/ → /music/*
+// 生产环境建议由 nginx 直接托管 /var/www/music/（性能更好），此处为本地开发兜底
+app.use(
+  '/music',
+  express.static(path.join(__dirname, 'public', 'music'), {
+    setHeaders: res => {
+      // 音频支持 Range 请求（拖动进度条），默认 express.static 已支持
+      res.setHeader('Accept-Ranges', 'bytes')
+    }
+  })
+)
+
+// 封面图片静态托管：server/public/covers/ → /covers/*
+app.use('/covers', express.static(path.join(__dirname, 'public', 'covers')))
+
 // 健康检查
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, env: process.env.NODE_ENV || 'development' })
 })
 
-// 业务路由后续在这里挂载：/api/auth /api/songs /api/comments ...
+// 业务路由
+app.use('/api/songs', songsRouter) // 歌曲列表/流派
+// 后续挂载：/api/auth /api/comments ...
 
 const PORT = process.env.PORT || 3000
 

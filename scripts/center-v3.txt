@@ -1,0 +1,339 @@
+      // 辅助：绘制倒角/多边形科技线框
+      function drawTechPanel(ctx, x, y, width, height, cut = 10) {
+        ctx.beginPath()
+        ctx.moveTo(x + cut, y)
+        ctx.lineTo(x + width - cut, y)
+        ctx.lineTo(x + width, y + cut)
+        ctx.lineTo(x + width, y + height - cut)
+        ctx.lineTo(x + width - cut, y + height)
+        ctx.lineTo(x + cut, y + height)
+        ctx.lineTo(x, y + height - cut)
+        ctx.lineTo(x, y + cut)
+        ctx.closePath()
+      }
+
+      function drawCenterContent(ctx, w, h) {
+        ctx.clearRect(0, 0, w, h)
+
+        // 1. 深邃航天暗底 + 点阵网格
+        ctx.fillStyle = '#04070f'
+        ctx.fillRect(0, 0, w, h)
+
+        // 点阵背景 (Dot Grid)
+        ctx.fillStyle = 'rgba(0, 229, 255, 0.06)'
+        const gridStep = Math.round(w * 0.05)
+        for (let gx = gridStep; gx < w; gx += gridStep) {
+          for (let gy = gridStep; gy < h; gy += gridStep) {
+            ctx.fillRect(gx, gy, 1.5, 1.5)
+          }
+        }
+
+        // 2. 外层机载 HUD 边框与 4 角固定螺栓/支架
+        const pad = w * 0.035
+        ctx.strokeStyle = 'rgba(0, 229, 255, 0.22)'
+        ctx.lineWidth = 1.5
+        drawTechPanel(ctx, pad, pad, w - pad * 2, h - pad * 2, 14)
+        ctx.stroke()
+
+        // 角标 L 构件
+        const bracketL = 16
+        ctx.strokeStyle = '#00e5ff'
+        ctx.lineWidth = 2.5
+        ctx.beginPath(); ctx.moveTo(pad - 2, pad + bracketL); ctx.lineTo(pad - 2, pad - 2); ctx.lineTo(pad + bracketL, pad - 2); ctx.stroke()
+        ctx.beginPath(); ctx.moveTo(w - pad + 2 - bracketL, pad - 2); ctx.lineTo(w - pad + 2, pad - 2); ctx.lineTo(w - pad + 2, pad + bracketL); ctx.stroke()
+        ctx.beginPath(); ctx.moveTo(pad - 2, h - pad - bracketL); ctx.lineTo(pad - 2, h - pad + 2); ctx.lineTo(pad + bracketL, h - pad + 2); ctx.stroke()
+        ctx.beginPath(); ctx.moveTo(w - pad + 2 - bracketL, h - pad + 2); ctx.lineTo(w - pad + 2, h - pad + 2); ctx.lineTo(w - pad + 2, h - pad - bracketL); ctx.stroke()
+
+        const t = (typeof musicState !== 'undefined' && musicState.currentTrack) ? musicState.currentTrack : {}
+        const trackIdx = (typeof musicState !== 'undefined' && typeof musicState.index === 'number') ? musicState.index + 1 : 1
+        const themeColor = t.color || '#00e5ff'
+
+        // ==========================================================
+        // 【顶部状态徽章与系统信息】
+        // ==========================================================
+        ctx.fillStyle = 'rgba(0, 229, 255, 0.08)'
+        ctx.fillRect(w * 0.08, h * 0.03, w * 0.84, h * 0.032)
+        ctx.strokeStyle = 'rgba(0, 229, 255, 0.25)'
+        ctx.strokeRect(w * 0.08, h * 0.03, w * 0.84, h * 0.032)
+
+        ctx.fillStyle = '#00e5ff'
+        ctx.font = '700 ' + Math.round(h * 0.015) + 'px "Courier New", monospace'
+        ctx.textAlign = 'left'
+        ctx.fillText('NOVA-OS // AV-SYSTEM', w * 0.11, h * 0.052)
+
+        ctx.textAlign = 'right'
+        ctx.fillStyle = '#7cf7ff'
+        ctx.fillText('GPS LOCK 99.4% [STABLE]', w * 0.89, h * 0.052)
+
+        // ==========================================================
+        // 【上部 60%】360° 罗盘星际雷达 HUD
+        // ==========================================================
+        const navH = h * 0.60
+        const ncx = w / 2
+        const ncy = navH * 0.50
+        const radarR = Math.min(w * 0.38, navH * 0.34)
+
+        // 目的地主标题卡
+        ctx.textAlign = 'center'
+        ctx.fillStyle = '#ffffff'
+        ctx.font = '900 ' + Math.round(h * 0.032) + 'px "Arial Black", "Impact", sans-serif'
+        ctx.fillText('DEST : K - P L A N E T', ncx, h * 0.10)
+
+        ctx.fillStyle = 'rgba(0, 229, 255, 0.5)'
+        ctx.font = '600 ' + Math.round(h * 0.014) + 'px monospace'
+        ctx.fillText('SECTOR 07-B // DEEP SPACE EXPEDITION', ncx, h * 0.122)
+
+        // 罗盘外圈圆环及刻度齿轮
+        ctx.strokeStyle = 'rgba(0, 229, 255, 0.3)'
+        ctx.lineWidth = 1.2
+        ctx.beginPath()
+        ctx.arc(ncx, ncy, radarR, 0, Math.PI * 2)
+        ctx.stroke()
+
+        // 360 度罗盘刻度线 (共 24 齿，主方位加长)
+        for (let a = 0; a < 360; a += 15) {
+          const rad = (a * Math.PI) / 180
+          const isMajor = a % 90 === 0
+          const isSemi = a % 45 === 0
+          const tickLen = isMajor ? 8 : (isSemi ? 5 : 3)
+          const p1x = ncx + Math.cos(rad) * radarR
+          const p1y = ncy + Math.sin(rad) * radarR
+          const p2x = ncx + Math.cos(rad) * (radarR - tickLen)
+          const p2y = ncy + Math.sin(rad) * (radarR - tickLen)
+
+          ctx.strokeStyle = isMajor ? '#00e5ff' : 'rgba(0, 229, 255, 0.3)'
+          ctx.lineWidth = isMajor ? 2 : 1
+          ctx.beginPath(); ctx.moveTo(p1x, p1y); ctx.lineTo(p2x, p2y); ctx.stroke()
+        }
+
+        // 方位字符 N / E / S / W
+        ctx.font = '700 ' + Math.round(h * 0.013) + 'px monospace'
+        ctx.fillStyle = '#00e5ff'
+        ctx.fillText('N', ncx, ncy - radarR + 15)
+        ctx.fillText('S', ncx, ncy + radarR - 7)
+        ctx.fillText('E', ncx + radarR - 11, ncy + 4)
+        ctx.fillText('W', ncx - radarR + 11, ncy + 4)
+
+        // 内部同心圆与 45° 辅助标线
+        ctx.strokeStyle = 'rgba(0, 229, 255, 0.12)'
+        ctx.lineWidth = 1
+        for (let i = 1; i <= 2; i++) {
+          ctx.beginPath()
+          ctx.arc(ncx, ncy, (radarR * i) / 3, 0, Math.PI * 2)
+          ctx.stroke()
+        }
+
+        ctx.save()
+        ctx.strokeStyle = 'rgba(0, 229, 255, 0.08)'
+        ctx.setLineDash([2, 4])
+        ctx.beginPath()
+        ctx.moveTo(ncx - radarR * 0.7, ncy - radarR * 0.7); ctx.lineTo(ncx + radarR * 0.7, ncy + radarR * 0.7)
+        ctx.moveTo(ncx + radarR * 0.7, ncy - radarR * 0.7); ctx.lineTo(ncx - radarR * 0.7, ncy + radarR * 0.7)
+        ctx.stroke()
+        ctx.restore()
+
+        // 静态扇区扫描辉光
+        const sweep = ctx.createRadialGradient(ncx, ncy, 0, ncx, ncy, radarR)
+        sweep.addColorStop(0, 'rgba(0, 229, 255, 0.22)')
+        sweep.addColorStop(0.8, 'rgba(0, 229, 255, 0.04)')
+        sweep.addColorStop(1, 'rgba(0, 229, 255, 0)')
+        ctx.fillStyle = sweep
+        ctx.beginPath()
+        ctx.moveTo(ncx, ncy)
+        ctx.arc(ncx, ncy, radarR - 1, Math.PI * 0.35, Math.PI * 0.75)
+        ctx.closePath()
+        ctx.fill()
+
+        // 目标点锁定标记 (红框 + 瞄准括号)
+        const targetA = Math.PI * 0.58, targetR = radarR * 0.62
+        const tx = ncx + Math.cos(targetA) * targetR, ty = ncy + Math.sin(targetA) * targetR
+
+        // 红色目标点与光晕
+        ctx.fillStyle = 'rgba(255, 59, 48, 0.25)'
+        ctx.beginPath(); ctx.arc(tx, ty, 9, 0, Math.PI * 2); ctx.fill()
+        ctx.fillStyle = '#ff3b30'
+        ctx.beginPath(); ctx.arc(tx, ty, 3.5, 0, Math.PI * 2); ctx.fill()
+
+        // 锁定瞄准角标括号 [ ]
+        ctx.strokeStyle = '#ff3b30'
+        ctx.lineWidth = 1.5
+        const bS = 7
+        ctx.beginPath()
+        ctx.moveTo(tx - bS, ty - bS + 3); ctx.lineTo(tx - bS, ty - bS); ctx.lineTo(tx - bS + 3, ty - bS)
+        ctx.moveTo(tx - bS, ty + bS - 3); ctx.lineTo(tx - bS, ty + bS); ctx.lineTo(tx - bS + 3, ty + bS)
+        ctx.moveTo(tx + bS, ty - bS + 3); ctx.lineTo(tx + bS, ty - bS); ctx.lineTo(tx + bS - 3, ty - bS)
+        ctx.moveTo(tx + bS, ty + bS - 3); ctx.lineTo(tx + bS, ty + bS); ctx.lineTo(tx + bS - 3, ty + bS)
+        ctx.stroke()
+
+        ctx.fillStyle = '#ff6b6b'
+        ctx.font = '700 ' + Math.round(h * 0.016) + 'px monospace'
+        ctx.textAlign = 'left'
+        ctx.fillText('OBJ::LOCKED', tx + 12, ty - 3)
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'
+        ctx.font = '600 ' + Math.round(h * 0.013) + 'px monospace'
+        ctx.fillText('14.8 AU', tx + 12, ty + 9)
+
+        // 自身飞船 HUD 航向光标 (极具未来感的折线战机)
+        ctx.save()
+        ctx.translate(ncx, ncy)
+        ctx.fillStyle = '#ffffff'
+        ctx.shadowColor = '#00e5ff'
+        ctx.shadowBlur = 8
+        ctx.beginPath()
+        ctx.moveTo(0, -11)
+        ctx.lineTo(7, 7)
+        ctx.lineTo(0, 3.5)
+        ctx.lineTo(-7, 7)
+        ctx.closePath()
+        ctx.fill()
+        ctx.restore()
+
+        // 雷达底部遥测数据栏 (复合切角 HUD 条)
+        const telY = navH * 0.88
+        ctx.fillStyle = 'rgba(0, 229, 255, 0.05)'
+        drawTechPanel(ctx, w * 0.08, telY, w * 0.84, h * 0.045, 6)
+        ctx.fill()
+        ctx.strokeStyle = 'rgba(0, 229, 255, 0.2)'
+        ctx.stroke()
+
+        ctx.fillStyle = '#7cf7ff'
+        ctx.font = '700 ' + Math.round(h * 0.015) + 'px monospace'
+        ctx.textAlign = 'left'
+        ctx.fillText('LAT 42.31°N  LON 87.63°E', w * 0.11, telY + h * 0.028)
+        ctx.textAlign = 'right'
+        ctx.fillText('HDG 084° // MACH 22', w * 0.89, telY + h * 0.028)
+
+        // 中间分割条 (带发光刻度)
+        const sepY = h * 0.63
+        ctx.strokeStyle = 'rgba(0, 229, 255, 0.3)'
+        ctx.lineWidth = 1
+        ctx.beginPath(); ctx.moveTo(w * 0.08, sepY); ctx.lineTo(w * 0.92, sepY); ctx.stroke()
+        ctx.fillStyle = '#00e5ff'
+        ctx.fillRect(w * 0.08, sepY - 2, 12, 4)
+        ctx.fillRect(w * 0.92 - 12, sepY - 2, 12, 4)
+
+        // ==========================================================
+        // 【下部 37%】高级音乐控制中心 (黑胶露出 + HUD 仪表)
+        // ==========================================================
+        const infoY = h * 0.66
+        const artSize = h * 0.165
+        const artX = w * 0.08
+        const artY = infoY + h * 0.015
+        const textX = artX + artSize + w * 0.045
+        const maxTextW = w * 0.92 - textX
+
+        // 1. 静态拟态黑胶底座 (从封面右侧探出)
+        const discX = artX + artSize * 0.35
+        ctx.save()
+        ctx.beginPath()
+        ctx.arc(discX + artSize / 2, artY + artSize / 2, artSize * 0.46, 0, Math.PI * 2)
+        ctx.fillStyle = '#0b0f19'
+        ctx.fill()
+        ctx.strokeStyle = 'rgba(0, 229, 255, 0.35)'
+        ctx.lineWidth = 1.5
+        ctx.stroke()
+
+        // 黑胶同心纹路
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)'
+        ctx.lineWidth = 1
+        for (let r = artSize * 0.18; r < artSize * 0.44; r += 5) {
+          ctx.beginPath()
+          ctx.arc(discX + artSize / 2, artY + artSize / 2, r, 0, Math.PI * 2)
+          ctx.stroke()
+        }
+        ctx.restore()
+
+        // 2. 专辑封面 (带切角边框与覆膜)
+        const coverImg = getLoadedCover(t.cover)
+        ctx.save()
+        drawTechPanel(ctx, artX, artY, artSize, artSize, 6)
+        ctx.clip()
+
+        if (coverImg) {
+          ctx.drawImage(coverImg, artX, artY, artSize, artSize)
+        } else {
+          // 降级高质感渐变
+          const grad = ctx.createLinearGradient(artX, artY, artX + artSize, artY + artSize)
+          grad.addColorStop(0, themeColor)
+          grad.addColorStop(1, '#09101d')
+          ctx.fillStyle = grad
+          ctx.fillRect(artX, artY, artSize, artSize)
+        }
+
+        // 封面静态高光反光膜 (45° 玻璃质感)
+        const gloss = ctx.createLinearGradient(artX, artY, artX + artSize, artY + artSize)
+        gloss.addColorStop(0, 'rgba(255, 255, 255, 0.15)')
+        gloss.addColorStop(0.4, 'rgba(255, 255, 255, 0.03)')
+        gloss.addColorStop(1, 'rgba(0, 0, 0, 0.25)')
+        ctx.fillStyle = gloss
+        ctx.fillRect(artX, artY, artSize, artSize)
+        ctx.restore()
+
+        // 封面 HUD 切角外边框
+        ctx.strokeStyle = '#00e5ff'
+        ctx.lineWidth = 1.5
+        drawTechPanel(ctx, artX, artY, artSize, artSize, 6)
+        ctx.stroke()
+
+        // 3. 右侧歌曲元数据与排版
+        // 顶部音轨指示与格式
+        ctx.fillStyle = '#00e5ff'
+        ctx.font = '700 ' + Math.round(h * 0.014) + 'px monospace'
+        ctx.textAlign = 'left'
+        const padIdx = String(trackIdx).padStart(2, '0')
+        ctx.fillText('TRK // ' + padIdx, textX, artY + h * 0.015)
+
+        ctx.fillStyle = 'rgba(124, 247, 255, 0.6)'
+        ctx.font = '600 ' + Math.round(h * 0.013) + 'px monospace'
+        ctx.fillText('FLAC 24-BIT/96kHz', textX + w * 0.22, artY + h * 0.015)
+
+        // 歌名 (粗体无衬线科技感)
+        ctx.fillStyle = '#ffffff'
+        ctx.font = '900 ' + Math.round(h * 0.026) + 'px "Helvetica Neue", "Segoe UI", sans-serif'
+        const titleText = t.title || 'NO SIGNAL'
+        ctx.fillText(titleText, textX, artY + h * 0.052, maxTextW)
+
+        // 艺术家与专辑
+        ctx.fillStyle = '#9cb4c9'
+        ctx.font = '600 ' + Math.round(h * 0.019) + 'px sans-serif'
+        const artistAlbum = (t.artist || 'UNKNOWN ARTIST') + ' · ' + (t.album || 'SINGLE')
+        ctx.fillText(artistAlbum, textX, artY + h * 0.086, maxTextW)
+
+        // 4. 底部微型徽章与静态 12 段均衡器快照
+        // BPM 徽章
+        if (t.bpm) {
+          const bpmBoxY = artY + h * 0.118
+          const bpmBoxH = h * 0.028
+          const bpmBoxW = w * 0.23
+
+          ctx.fillStyle = 'rgba(0, 229, 255, 0.12)'
+          drawTechPanel(ctx, textX, bpmBoxY, bpmBoxW, bpmBoxH, 4)
+          ctx.fill()
+          ctx.strokeStyle = '#00e5ff'
+          ctx.lineWidth = 1
+          ctx.stroke()
+
+          ctx.fillStyle = '#00e5ff'
+          ctx.font = '800 ' + Math.round(h * 0.016) + 'px monospace'
+          ctx.textAlign = 'center'
+          ctx.fillText(t.bpm + ' BPM', textX + bpmBoxW / 2, bpmBoxY + bpmBoxH * 0.70)
+        }
+
+        // 静态 12 段均衡器快照柱状图 (Equalizer Snapshot)
+        const eqX = textX + (t.bpm ? w * 0.26 : 0)
+        const eqY = artY + h * 0.118
+        const eqW = maxTextW - (t.bpm ? w * 0.26 : 0)
+        const barCount = 10
+        const barW = Math.max(2, (eqW / barCount) - 3)
+
+        // 伪随机静态高低曲线 (呈现专业频谱感)
+        const eqPattern = [0.45, 0.75, 0.6, 0.9, 0.35, 0.8, 0.55, 0.7, 0.4, 0.65]
+
+        ctx.fillStyle = 'rgba(0, 229, 255, 0.45)'
+        for (let b = 0; b < barCount; b++) {
+          const barH = (h * 0.026) * eqPattern[b % eqPattern.length]
+          const bx = eqX + b * (barW + 3)
+          const by = eqY + (h * 0.028) - barH
+          ctx.fillRect(bx, by, barW, barH)
+        }
+      }

@@ -1,0 +1,388 @@
+      const drawHologram = () => {
+        if (!holoCanvas || !holoTex) return
+        const hctx = holoCanvas.getContext('2d')
+        const W = holoCanvas.width
+        const H = holoCanvas.height
+
+        // 清空并重新收集交互碰撞区域
+        holoButtons.length = 0
+
+        // 1. 全息半透明深蓝底色 + 点阵网格
+        hctx.clearRect(0, 0, W, H)
+        hctx.fillStyle = 'rgba(4, 8, 16, 0.92)'
+        hctx.fillRect(0, 0, W, H)
+
+        // 点阵背景
+        hctx.fillStyle = 'rgba(0, 229, 255, 0.05)'
+        const gridStep = Math.round(W * 0.035)
+        for (let gx = gridStep; gx < W; gx += gridStep) {
+          for (let gy = gridStep; gy < H; gy += gridStep) {
+            hctx.fillRect(gx, gy, 1.5, 1.5)
+          }
+        }
+
+        // 全息外层科技倒角外框
+        const pad = W * 0.015
+        hctx.strokeStyle = 'rgba(0, 229, 255, 0.25)'
+        hctx.lineWidth = 1.5
+        drawTechPanel(hctx, pad, pad, W - pad * 2, H - pad * 2, 12)
+        hctx.stroke()
+
+        // 四角 L 构件
+        const bracketL = 14
+        hctx.strokeStyle = '#00e5ff'
+        hctx.lineWidth = 2
+        hctx.beginPath(); hctx.moveTo(pad - 1, pad + bracketL); hctx.lineTo(pad - 1, pad - 1); hctx.lineTo(pad + bracketL, pad - 1); hctx.stroke()
+        hctx.beginPath(); hctx.moveTo(W - pad + 1 - bracketL, pad - 1); hctx.lineTo(W - pad + 1, pad - 1); hctx.lineTo(W - pad + 1, pad + bracketL); hctx.stroke()
+        hctx.beginPath(); hctx.moveTo(pad - 1, H - pad - bracketL); hctx.lineTo(pad - 1, pad + H - pad * 2 + 1); hctx.lineTo(pad + bracketL, H - pad + 1); hctx.stroke()
+        hctx.beginPath(); hctx.moveTo(W - pad + 1 - bracketL, H - pad + 1); hctx.lineTo(W - pad + 1, H - pad + 1); hctx.lineTo(W - pad + 1, H - pad - bracketL); hctx.stroke()
+
+        // 顶部全局状态栏
+        hctx.fillStyle = 'rgba(0, 229, 255, 0.08)'
+        hctx.fillRect(W * 0.03, H * 0.025, W * 0.94, H * 0.045)
+        hctx.strokeStyle = 'rgba(0, 229, 255, 0.2)'
+        hctx.strokeRect(W * 0.03, H * 0.025, W * 0.94, H * 0.045)
+
+        hctx.fillStyle = '#00e5ff'
+        hctx.font = '700 ' + Math.round(H * 0.026) + 'px monospace'
+        hctx.textAlign = 'left'
+        hctx.fillText('NOVA HOLO-DECK // TRIPLE-MONITOR V2.4', W * 0.05, H * 0.057)
+
+        hctx.textAlign = 'right'
+        hctx.fillStyle = '#7cf7ff'
+        hctx.fillText('STREAM LINK: 5.8 GHz [OPTICAL]', W * 0.95, H * 0.057)
+
+        const t = (typeof musicState !== 'undefined' && musicState.currentTrack) ? musicState.currentTrack : {}
+        const trackIdx = (typeof musicState !== 'undefined' && typeof musicState.index === 'number') ? musicState.index : 0
+        const themeColor = t.color || '#00e5ff'
+
+        // 三栏通用布局参数
+        const colW = (W - pad * 2) / 3
+        const col1X = pad
+        const col2X = pad + colW
+        const col3X = pad + colW * 2
+        const bodyY = H * 0.09
+        const bodyH = H * 0.88
+
+        // 栏目垂直分割线 (带刻度点)
+        hctx.strokeStyle = 'rgba(0, 229, 255, 0.2)'
+        hctx.lineWidth = 1
+        ;[col2X, col3X].forEach(sx => {
+          hctx.beginPath(); hctx.moveTo(sx, bodyY); hctx.lineTo(sx, bodyY + bodyH); hctx.stroke()
+          hctx.fillStyle = '#00e5ff'
+          hctx.fillRect(sx - 2, bodyY + 10, 4, 10)
+          hctx.fillRect(sx - 2, bodyY + bodyH - 20, 4, 10)
+        })
+
+        // ==========================================================
+        // 【左 1/3】深空雷达导航 HUD
+        // ==========================================================
+        hctx.save()
+        hctx.beginPath(); hctx.rect(col1X, bodyY, colW, bodyH); hctx.clip()
+
+        const lcx = col1X + colW / 2
+        const lcy = bodyY + bodyH * 0.44
+        const lr = Math.min(colW * 0.38, bodyH * 0.32)
+
+        // 区域小标
+        hctx.fillStyle = '#00e5ff'
+        hctx.font = '700 ' + Math.round(H * 0.024) + 'px monospace'
+        hctx.textAlign = 'left'
+        hctx.fillText('01 // ORBITAL RADAR', col1X + colW * 0.08, bodyY + H * 0.035)
+
+        // 目的地主标题
+        hctx.textAlign = 'center'
+        hctx.fillStyle = '#ffffff'
+        hctx.font = '900 ' + Math.round(H * 0.038) + 'px "Arial Black", sans-serif'
+        hctx.fillText('DEST: K-PLANET', lcx, bodyY + H * 0.08)
+
+        // 雷达外圈与 360° 方位刻度
+        hctx.strokeStyle = 'rgba(0, 229, 255, 0.3)'
+        hctx.beginPath(); hctx.arc(lcx, lcy, lr, 0, Math.PI * 2); hctx.stroke()
+
+        for (let a = 0; a < 360; a += 30) {
+          const rad = (a * Math.PI) / 180
+          const isMajor = a % 90 === 0
+          const tickLen = isMajor ? 6 : 3
+          const p1x = lcx + Math.cos(rad) * lr, p1y = lcy + Math.sin(rad) * lr
+          const p2x = lcx + Math.cos(rad) * (lr - tickLen), p2y = lcy + Math.sin(rad) * (lr - tickLen)
+          hctx.strokeStyle = isMajor ? '#00e5ff' : 'rgba(0, 229, 255, 0.3)'
+          hctx.beginPath(); hctx.moveTo(p1x, p1y); hctx.lineTo(p2x, p2y); hctx.stroke()
+        }
+
+        // 同心圆与十字准星
+        hctx.strokeStyle = 'rgba(0, 229, 255, 0.12)'
+        for (let i = 1; i <= 2; i++) {
+          hctx.beginPath(); hctx.arc(lcx, lcy, (lr * i) / 3, 0, Math.PI * 2); hctx.stroke()
+        }
+        hctx.beginPath(); hctx.moveTo(lcx - lr, lcy); hctx.lineTo(lcx + lr, lcy); hctx.stroke()
+        hctx.beginPath(); hctx.moveTo(lcx, lcy - lr); hctx.lineTo(lcx, lcy + lr); hctx.stroke()
+
+        // 静态扫描扇区渐变
+        const lSweep = hctx.createRadialGradient(lcx, lcy, 0, lcx, lcy, lr)
+        lSweep.addColorStop(0, 'rgba(0, 229, 255, 0.25)')
+        lSweep.addColorStop(1, 'rgba(0, 229, 255, 0)')
+        hctx.fillStyle = lSweep
+        hctx.beginPath(); hctx.moveTo(lcx, lcy); hctx.arc(lcx, lcy, lr - 1, Math.PI * 0.4, Math.PI * 0.75); hctx.closePath(); hctx.fill()
+
+        // 目标点锁定标记
+        const ta = Math.PI * 0.58, tr = lr * 0.62
+        const tx = lcx + Math.cos(ta) * tr, ty = lcy + Math.sin(ta) * tr
+        hctx.fillStyle = '#ff3b30'
+        hctx.beginPath(); hctx.arc(tx, ty, 3.5, 0, Math.PI * 2); hctx.fill()
+
+        // 锁定角标 [ ]
+        hctx.strokeStyle = '#ff3b30'
+        hctx.lineWidth = 1.5
+        const bS = 6
+        hctx.beginPath()
+        hctx.moveTo(tx - bS, ty - bS + 2); hctx.lineTo(tx - bS, ty - bS); hctx.lineTo(tx - bS + 2, ty - bS)
+        hctx.moveTo(tx + bS, ty - bS + 2); hctx.lineTo(tx + bS, ty - bS); hctx.lineTo(tx + bS - 2, ty - bS)
+        hctx.moveTo(tx - bS, ty + bS - 2); hctx.lineTo(tx - bS, ty + bS); hctx.lineTo(tx - bS + 2, ty + bS)
+        hctx.moveTo(tx + bS, ty + bS - 2); hctx.lineTo(tx + bS, ty + bS); hctx.lineTo(tx + bS - 2, ty + bS)
+        hctx.stroke()
+
+        hctx.fillStyle = '#ff6b6b'
+        hctx.font = '700 ' + Math.round(H * 0.022) + 'px monospace'
+        hctx.textAlign = 'left'
+        hctx.fillText('TARGET: K-PLANET', tx + 9, ty + 2)
+
+        // 中心自车指示
+        hctx.save()
+        hctx.translate(lcx, lcy)
+        hctx.fillStyle = '#00e5ff'
+        hctx.beginPath(); hctx.moveTo(0, -8); hctx.lineTo(5, 5); hctx.lineTo(0, 2); hctx.lineTo(-5, 5); hctx.closePath(); hctx.fill()
+        hctx.restore()
+
+        // 左栏底部遥测状态
+        const lStatY = bodyY + bodyH * 0.82
+        drawTechPanel(hctx, col1X + colW * 0.08, lStatY, colW * 0.84, H * 0.09, 5)
+        hctx.fillStyle = 'rgba(0, 229, 255, 0.06)'
+        hctx.fill()
+        hctx.strokeStyle = 'rgba(0, 229, 255, 0.2)'
+        hctx.stroke()
+
+        hctx.fillStyle = '#7cf7ff'
+        hctx.font = '600 ' + Math.round(H * 0.024) + 'px monospace'
+        hctx.textAlign = 'center'
+        hctx.fillText('LAT 42.31°N // LON 87.63°E', lcx, lStatY + H * 0.038)
+        hctx.fillText('VELOCITY: 7.4 km/s (ORBIT)', lcx, lStatY + H * 0.072)
+        hctx.restore()
+
+        // ==========================================================
+        // 【中 1/3】当前音频与交互控制
+        // ==========================================================
+        hctx.save()
+        hctx.beginPath(); hctx.rect(col2X, bodyY, colW, bodyH); hctx.clip()
+
+        const mcx = col2X + colW / 2
+        const artSize = Math.min(colW * 0.44, H * 0.26)
+        const artX = mcx - artSize / 2
+        const artY = bodyY + H * 0.065
+
+        // 区域小标
+        hctx.fillStyle = '#00e5ff'
+        hctx.font = '700 ' + Math.round(H * 0.024) + 'px monospace'
+        hctx.textAlign = 'left'
+        hctx.fillText('02 // CURRENT AUDIO', col2X + colW * 0.08, bodyY + H * 0.035)
+
+        // 静态黑胶探出底座
+        const discX = artX + artSize * 0.32
+        hctx.save()
+        hctx.beginPath(); hctx.arc(discX + artSize / 2, artY + artSize / 2, artSize * 0.46, 0, Math.PI * 2)
+        hctx.fillStyle = '#0a0e18'; hctx.fill()
+        hctx.strokeStyle = 'rgba(0, 229, 255, 0.35)'; hctx.lineWidth = 1.2; hctx.stroke()
+        for (let r = artSize * 0.18; r < artSize * 0.44; r += 4.5) {
+          hctx.beginPath(); hctx.arc(discX + artSize / 2, artY + artSize / 2, r, 0, Math.PI * 2)
+          hctx.strokeStyle = 'rgba(255, 255, 255, 0.06)'; hctx.stroke()
+        }
+        hctx.restore()
+
+        // 封面主体（带科技切角与覆膜）
+        const coverImg = (typeof getLoadedCover === 'function') ? getLoadedCover(t.cover) : null
+        hctx.save()
+        drawTechPanel(hctx, artX, artY, artSize, artSize, 6)
+        hctx.clip()
+        if (coverImg) {
+          hctx.drawImage(coverImg, artX, artY, artSize, artSize)
+        } else {
+          const grad = hctx.createLinearGradient(artX, artY, artX + artSize, artY + artSize)
+          grad.addColorStop(0, themeColor); grad.addColorStop(1, '#09101d')
+          hctx.fillStyle = grad; hctx.fillRect(artX, artY, artSize, artSize)
+        }
+        // 玻璃覆膜
+        const gloss = hctx.createLinearGradient(artX, artY, artX + artSize, artY + artSize)
+        gloss.addColorStop(0, 'rgba(255, 255, 255, 0.15)')
+        gloss.addColorStop(0.5, 'rgba(255, 255, 255, 0.0)')
+        gloss.addColorStop(1, 'rgba(0, 0, 0, 0.3)')
+        hctx.fillStyle = gloss; hctx.fillRect(artX, artY, artSize, artSize)
+        hctx.restore()
+
+        hctx.strokeStyle = '#00e5ff'; hctx.lineWidth = 1.5
+        drawTechPanel(hctx, artX, artY, artSize, artSize, 6)
+        hctx.stroke()
+
+        // 歌名与艺术家
+        hctx.textAlign = 'center'
+        hctx.fillStyle = '#ffffff'
+        hctx.font = '900 ' + Math.round(H * 0.042) + 'px "Helvetica Neue", sans-serif'
+        hctx.fillText(t.title || 'NO SIGNAL', mcx, artY + artSize + H * 0.065, colW * 0.86)
+
+        hctx.fillStyle = '#8ea1b4'
+        hctx.font = '600 ' + Math.round(H * 0.028) + 'px sans-serif'
+        const subMeta = (t.artist || 'UNKNOWN') + ' · ' + (t.album || 'SINGLE')
+        hctx.fillText(subMeta, mcx, artY + artSize + H * 0.115, colW * 0.86)
+
+        // BPM 与 格式徽章 + 静态频谱
+        const badgeY = artY + artSize + H * 0.145
+        if (t.bpm) {
+          const bw = colW * 0.26, bh = H * 0.04
+          const bx = mcx - bw - 6
+          drawTechPanel(hctx, bx, badgeY, bw, bh, 3)
+          hctx.fillStyle = 'rgba(0, 229, 255, 0.1)'; hctx.fill()
+          hctx.strokeStyle = '#00e5ff'; hctx.stroke()
+          hctx.fillStyle = '#00e5ff'
+          hctx.font = '800 ' + Math.round(H * 0.022) + 'px monospace'
+          hctx.fillText(t.bpm + ' BPM', bx + bw / 2, badgeY + bh * 0.7)
+
+          // 格式徽章
+          const fx = mcx + 6
+          drawTechPanel(hctx, fx, badgeY, bw, bh, 3)
+          hctx.fillStyle = 'rgba(0, 229, 255, 0.06)'; hctx.fill()
+          hctx.strokeStyle = 'rgba(0, 229, 255, 0.3)'; hctx.stroke()
+          hctx.fillStyle = '#7cf7ff'
+          hctx.font = '700 ' + Math.round(H * 0.020) + 'px monospace'
+          hctx.fillText('24-BIT', fx + bw / 2, badgeY + bh * 0.7)
+        }
+
+        // 控制按键栏（登记进入 holoButtons 供 3D 点击交互）
+        const ctrlY = bodyY + bodyH * 0.82
+        const btnW = colW * 0.24, btnH = H * 0.08
+        const gap = colW * 0.04
+        const b1x = mcx - btnW * 1.5 - gap
+        const b2x = mcx - btnW * 0.5
+        const b3x = mcx + btnW * 0.5 + gap
+
+        // PREV 按钮
+        drawTechPanel(hctx, b1x, ctrlY, btnW, btnH, 4)
+        hctx.fillStyle = 'rgba(0, 229, 255, 0.08)'; hctx.fill()
+        hctx.strokeStyle = 'rgba(0, 229, 255, 0.3)'; hctx.stroke()
+        hctx.fillStyle = '#00e5ff'; hctx.font = '700 ' + Math.round(H * 0.024) + 'px monospace'
+        hctx.fillText('⏮ PREV', b1x + btnW / 2, ctrlY + btnH * 0.62)
+        holoButtons.push({
+          name: 'ctrl-prev',
+          x: b1x, y: ctrlY, w: btnW, h: btnH,
+          action: () => { if (typeof player !== 'undefined' && player.prev) player.prev() }
+        })
+
+        // PLAY/PAUSE 按钮
+        drawTechPanel(hctx, b2x, ctrlY, btnW, btnH, 4)
+        hctx.fillStyle = 'rgba(0, 229, 255, 0.18)'; hctx.fill()
+        hctx.strokeStyle = '#00e5ff'; hctx.lineWidth = 1.5; hctx.stroke()
+        const isPlay = (typeof musicState !== 'undefined' && musicState.isPlaying)
+        hctx.fillStyle = '#ffffff'
+        hctx.fillText(isPlay ? '⏸ PAUSE' : '▶ PLAY', b2x + btnW / 2, ctrlY + btnH * 0.62)
+        holoButtons.push({
+          name: 'ctrl-toggle',
+          x: b2x, y: ctrlY, w: btnW, h: btnH,
+          action: () => { if (typeof player !== 'undefined' && player.toggle) player.toggle() }
+        })
+
+        // NEXT 按钮
+        drawTechPanel(hctx, b3x, ctrlY, btnW, btnH, 4)
+        hctx.fillStyle = 'rgba(0, 229, 255, 0.08)'; hctx.fill()
+        hctx.strokeStyle = 'rgba(0, 229, 255, 0.3)'; hctx.lineWidth = 1; hctx.stroke()
+        hctx.fillStyle = '#00e5ff'
+        hctx.fillText('NEXT ⏭', b3x + btnW / 2, ctrlY + btnH * 0.62)
+        holoButtons.push({
+          name: 'ctrl-next',
+          x: b3x, y: ctrlY, w: btnW, h: btnH,
+          action: () => { if (typeof player !== 'undefined' && player.next) player.next() }
+        })
+
+        hctx.restore()
+
+        // ==========================================================
+        // 【右 1/3】高精度播放列表 (带发光卡片与完整命中区域)
+        // ==========================================================
+        hctx.save()
+        hctx.beginPath(); hctx.rect(col3X, bodyY, colW, bodyH); hctx.clip()
+
+        const listStartX = col3X + colW * 0.06
+        const listW = colW * 0.88
+
+        // 区域小标
+        hctx.fillStyle = '#00e5ff'
+        hctx.font = '700 ' + Math.round(H * 0.024) + 'px monospace'
+        hctx.textAlign = 'left'
+        hctx.fillText('03 // QUEUE SELECTION', listStartX, bodyY + H * 0.035)
+
+        // 渲染前 10 首曲目卡片
+        const itemH = bodyH * 0.082
+        const itemGap = H * 0.007
+        const listTop = bodyY + H * 0.062
+        const tracksList = (typeof NOVA_TRACKS !== 'undefined') ? NOVA_TRACKS.slice(0, 10) : []
+
+        tracksList.forEach((tr, i) => {
+          const itemY = listTop + i * (itemH + itemGap)
+          const active = (i === trackIdx)
+
+          // 列表单项卡片底色
+          if (active) {
+            drawTechPanel(hctx, listStartX, itemY, listW, itemH, 4)
+            hctx.fillStyle = 'rgba(0, 229, 255, 0.22)'
+            hctx.fill()
+            hctx.strokeStyle = '#00e5ff'
+            hctx.lineWidth = 1.2
+            hctx.stroke()
+
+            // Active 发光标记条
+            hctx.fillStyle = '#00e5ff'
+            hctx.fillRect(listStartX, itemY + 2, 4, itemH - 4)
+          } else {
+            drawTechPanel(hctx, listStartX, itemY, listW, itemH, 4)
+            hctx.fillStyle = 'rgba(0, 229, 255, 0.04)'
+            hctx.fill()
+            hctx.strokeStyle = 'rgba(0, 229, 255, 0.12)'
+            hctx.stroke()
+          }
+
+          // 音轨号 01, 02...
+          const padNum = String(i + 1).padStart(2, '0')
+          hctx.fillStyle = active ? '#00e5ff' : 'rgba(0, 229, 255, 0.45)'
+          hctx.font = '700 ' + Math.round(H * 0.024) + 'px monospace'
+          hctx.textAlign = 'left'
+          hctx.fillText(padNum, listStartX + 10, itemY + itemH * 0.64)
+
+          // 歌名与艺术家 (单行排版)
+          hctx.fillStyle = active ? '#ffffff' : 'rgba(255, 255, 255, 0.65)'
+          hctx.font = (active ? '700 ' : '500 ') + Math.round(H * 0.027) + 'px sans-serif'
+          const songName = tr.title || 'TRACK'
+          hctx.fillText(songName, listStartX + 42, itemY + itemH * 0.64, listW - 90)
+
+          // 右侧指示微标
+          hctx.textAlign = 'right'
+          hctx.fillStyle = active ? '#00e5ff' : 'rgba(0, 229, 255, 0.25)'
+          hctx.font = '600 ' + Math.round(H * 0.020) + 'px monospace'
+          hctx.fillText(active ? 'PLAYING' : 'READY', listStartX + listW - 8, itemY + itemH * 0.64)
+
+          // 登记命中测试盒（严格对应此卡片像素范围）
+          holoButtons.push({
+            name: 'list-' + i,
+            x: listStartX,
+            y: itemY,
+            w: listW,
+            h: itemH,
+            action: () => {
+              if (typeof player !== 'undefined' && player.select) {
+                player.select(i)
+              }
+            }
+          })
+        })
+
+        hctx.restore()
+
+        // 提交 Three.js 纹理更新
+        holoTex.needsUpdate = true
+      }

@@ -13,3 +13,15 @@ dist/
 Thumbs.db
 .idea/
 .vscode/
+
+# 音乐/音频/封面文件（体积大，不提交 GitHub，用单独方式部署）
+server/public/music/**/*.mp3
+server/public/music/**/*.flac
+server/public/music/**/*.wav
+server/public/music/**/*.ogg
+server/public/music/**/*.m4a
+server/public/music/**/*.aac
+server/public/covers/**/*.jpg
+server/public/covers/**/*.jpeg
+server/public/covers/**/*.png
+server/public/covers/**/*.webp
