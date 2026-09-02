@@ -126,66 +126,83 @@
       </div>
     </div>
 
-    <!-- 3. 新建 / 编辑文章模态框 -->
+    <!-- 3. 新建 / 编辑文章沉浸式模态框 -->
     <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
-      <div class="modal-card">
-        <div class="modal-header">
-          <h3>{{ isEditing ? '编辑文章: ' + editorForm.title : '撰写新铭文' }}</h3>
-          <button @click="closeModal" class="btn-close">×</button>
-        </div>
-
-        <form @submit.prevent="savePost" class="editor-form">
-          <div class="form-row">
-            <div class="form-group flex-2">
-              <label>文章标题 (Title) *</label>
-              <input v-model="editorForm.title" type="text" required placeholder="如：从零搭建 Three.js 全景车舱" />
+      <div class="modal-card immersive-card">
+        <form @submit.prevent="savePost" class="immersive-form">
+          <!-- 顶部极简操作栏 -->
+          <div class="immersive-header">
+            <div class="header-left-tag">
+              <span class="stele-glyph">🏛️</span>
+              <span class="stele-mode">{{ isEditing ? '编辑铭文' : '撰写新铭文' }}</span>
             </div>
-            <div class="form-group flex-1">
-              <label>URL 标识符 (Slug) *</label>
-              <input v-model="editorForm.slug" type="text" required placeholder="如：threejs-car-cockpit" />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group flex-1">
-              <label>分类领域 (Category)</label>
-              <input v-model="editorForm.category" type="text" placeholder="如：dev / mind / thoughts" />
-            </div>
-            <div class="form-group flex-1">
-              <label>发布日期 (Date)</label>
-              <input v-model="editorForm.date" type="date" required />
-            </div>
-            <div class="form-group flex-1">
-              <label>标签 (逗号分隔)</label>
-              <input v-model="editorForm.tagsInput" type="text" placeholder="WebGL, Three.js, Vue" />
-            </div>
-            <div class="form-group-checkbox">
-              <label>
+            <div class="header-actions">
+              <label class="tag-checkbox-pill">
                 <input v-model="editorForm.isFeatured" type="checkbox" />
-                精选置顶 (Featured)
+                <span>★ 精选置顶</span>
               </label>
+              <button type="button" @click="closeModal" class="btn-secondary-sm">取消</button>
+              <button type="submit" class="btn-primary-sm" :disabled="isSaving">
+                {{ isSaving ? '保存中...' : (isEditing ? '保存修改' : '立即发布') }}
+              </button>
             </div>
           </div>
 
-          <div class="form-group">
-            <label>文章摘要 (Excerpt)</label>
-            <textarea v-model="editorForm.excerpt" rows="2" placeholder="简短摘要，用于列表卡片展示..."></textarea>
+          <!-- 极简大标题输入 -->
+          <div class="title-wrap">
+            <input
+              v-model="editorForm.title"
+              type="text"
+              required
+              class="immersive-title-input"
+              placeholder="在此镌刻文章标题..."
+            />
           </div>
 
-          <div class="form-group">
-            <label>Markdown 正文内容 (Content)</label>
-            <textarea v-model="editorForm.content" rows="12" class="code-textarea" placeholder="# 一级标题&#10;&#10;正文 Markdown 内容..."></textarea>
+          <!-- 单行胶囊元数据栏 (Category / Slug / Date / Tags 全部标签化) -->
+          <div class="capsule-meta-bar">
+            <div class="capsule-item">
+              <span class="capsule-label">📁 分类</span>
+              <input v-model="editorForm.category" type="text" placeholder="dev / mind" class="capsule-input" />
+            </div>
+            <div class="capsule-divider"></div>
+            <div class="capsule-item">
+              <span class="capsule-label">🔗 Slug</span>
+              <input v-model="editorForm.slug" type="text" required placeholder="url-slug" class="capsule-input" />
+            </div>
+            <div class="capsule-divider"></div>
+            <div class="capsule-item">
+              <span class="capsule-label">📅 日期</span>
+              <input v-model="editorForm.date" type="date" required class="capsule-input date-input" />
+            </div>
+            <div class="capsule-divider"></div>
+            <div class="capsule-item flex-tags">
+              <span class="capsule-label">🏷️ 标签</span>
+              <input v-model="editorForm.tagsInput" type="text" placeholder="逗号分隔" class="capsule-input" />
+            </div>
+          </div>
+
+          <!-- 极简单行摘要 -->
+          <div class="excerpt-wrap">
+            <input
+              v-model="editorForm.excerpt"
+              type="text"
+              class="immersive-excerpt-input"
+              placeholder="📝 摘要（选填，展示在列表卡片上）..."
+            />
+          </div>
+
+          <!-- 巨大化 Markdown 正文编辑区 (占据屏幕绝对主体) -->
+          <div class="body-editor-wrap">
+            <textarea
+              v-model="editorForm.content"
+              class="immersive-textarea"
+              placeholder="在此撰写正文 Markdown 内容... (支持标题、列表、代码块、引用等)"
+            ></textarea>
           </div>
 
           <div v-if="saveError" class="error-banner">
             ⚠️ {{ saveError }}
-          </div>
-
-          <div class="modal-footer">
-            <button type="button" @click="closeModal" class="btn-secondary">取消</button>
-            <button type="submit" class="btn-primary" :disabled="isSaving">
-              {{ isSaving ? '正在保存...' : (isEditing ? '保存修改' : '立即发布') }}
-            </button>
           </div>
         </form>
       </div>
@@ -649,72 +666,213 @@ onMounted(() => {
   color: #64748b;
 }
 
-/* 模态框 */
+/* 沉浸式写作模态框 */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 16px;
 }
-.modal-card {
-  background: #161b22;
-  border: 1px solid rgba(212, 163, 89, 0.3);
-  border-radius: 12px;
+.immersive-card {
+  background: #0f141c;
+  border: 1px solid rgba(212, 163, 89, 0.35);
+  border-radius: 14px;
   width: 100%;
-  max-width: 800px;
-  max-height: 90vh;
-  overflow-y: auto;
-  padding: 28px;
-  box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+  max-width: 1100px;
+  height: 88vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.8), 0 0 40px rgba(212, 163, 89, 0.08);
+  overflow: hidden;
+  padding: 0;
 }
-.modal-header {
+.immersive-form {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 20px 28px 16px;
+  gap: 12px;
+}
+
+/* 顶部极简操作栏 */
+.immersive-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
-.modal-header h3 {
-  color: #f8fafc;
-  margin: 0;
-  font-size: 18px;
-}
-.btn-close {
-  background: transparent;
-  border: none;
-  color: #94a3b8;
-  font-size: 24px;
-  cursor: pointer;
-}
-.form-row {
-  display: flex;
-  gap: 16px;
-}
-.flex-1 { flex: 1; }
-.flex-2 { flex: 2; }
-.form-group-checkbox {
+.header-left-tag {
   display: flex;
   align-items: center;
-  padding-top: 24px;
-}
-.form-group-checkbox label {
+  gap: 8px;
   font-size: 13px;
-  color: #cbd5e1;
+  font-weight: 600;
+  color: #d4a359;
+}
+.stele-mode {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tag-checkbox-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  padding: 4px 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  user-select: none;
+}
+.btn-secondary-sm {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  padding: 5px 14px;
+  border-radius: 6px;
+  font-size: 12px;
   cursor: pointer;
 }
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 24px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+.btn-primary-sm {
+  background: linear-gradient(135deg, #d4a359, #b8860b);
+  border: none;
+  color: #0d1117;
+  font-weight: 700;
+  padding: 5px 18px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
 }
-.modal-footer .btn-primary { width: auto; }
+
+/* 极简大标题输入框 */
+.title-wrap {
+  width: 100%;
+}
+.immersive-title-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid transparent;
+  color: #f8fafc;
+  font-size: 24px;
+  font-weight: 700;
+  padding: 4px 0;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+.immersive-title-input:focus {
+  border-bottom-color: rgba(212, 163, 89, 0.4);
+}
+.immersive-title-input::placeholder {
+  color: #475569;
+}
+
+/* 单行胶囊元数据栏 */
+.capsule-meta-bar {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 4px 10px;
+  gap: 8px;
+}
+.capsule-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.capsule-label {
+  font-size: 11px;
+  color: #64748b;
+  white-space: nowrap;
+}
+.capsule-input {
+  background: transparent;
+  border: none;
+  color: #e2e8f0;
+  font-size: 12px;
+  outline: none;
+  width: 90px;
+  font-family: inherit;
+}
+.capsule-input.date-input {
+  width: 115px;
+  color-scheme: dark;
+}
+.flex-tags {
+  flex: 1;
+}
+.flex-tags .capsule-input {
+  width: 100%;
+}
+.capsule-divider {
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* 极简单行摘要 */
+.excerpt-wrap {
+  width: 100%;
+}
+.immersive-excerpt-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  color: #94a3b8;
+  font-size: 12px;
+  padding: 6px 12px;
+  outline: none;
+  font-family: inherit;
+}
+.immersive-excerpt-input:focus {
+  border-color: rgba(212, 163, 89, 0.3);
+  color: #cbd5e1;
+}
+
+/* 巨大化 Markdown 正文编辑区 */
+.body-editor-wrap {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  margin-top: 4px;
+}
+.immersive-textarea {
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 16px 20px;
+  color: #f1f5f9;
+  font-family: "JetBrains Mono", Consolas, "Fira Code", monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  resize: none;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.immersive-textarea:focus {
+  border-color: rgba(212, 163, 89, 0.5);
+  background: rgba(0, 0, 0, 0.45);
+}
+.immersive-textarea::placeholder {
+  color: #475569;
+}
 </style>
