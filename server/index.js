@@ -17,8 +17,9 @@ dotenv.config({ path: path.resolve(__dirname, '..', envFile) })
 const app = express()
 app.use(express.json())
 
-// 博客 API：/api/posts（SQLite，游标分页）—— 合并自 notion-blog-mvp
+// 博客与知识库 API：/api/posts + /api/wiki
 app.use('/api/posts', blogRouter)
+app.use('/api', blogRouter)
 
 // 音乐文件静态托管：server/public/music/ → /music/*
 // 生产环境建议由 nginx 直接托管 /var/www/music/（性能更好），此处为本地开发兜底
