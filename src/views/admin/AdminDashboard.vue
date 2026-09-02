@@ -159,26 +159,70 @@
             />
           </div>
 
-          <!-- 单行胶囊元数据栏 (Category / Slug / Date / Tags 全部标签化) -->
+          <!-- 交互式单行胶囊元数据栏 (Category / Slug / Date / Tags 全部交互标签化) -->
           <div class="capsule-meta-bar">
-            <div class="capsule-item">
+            <!-- 分类选择胶囊 -->
+            <div class="capsule-item cat-selector">
               <span class="capsule-label">📁 分类</span>
-              <input v-model="editorForm.category" type="text" placeholder="dev / mind" class="capsule-input" />
+              <div class="cat-pill-group">
+                <button
+                  v-for="cat in commonCategories"
+                  :key="cat.key"
+                  type="button"
+                  class="cat-chip-btn"
+                  :class="{ active: editorForm.category === cat.key }"
+                  @click="editorForm.category = cat.key"
+                >
+                  {{ cat.label }}
+                </button>
+                <input
+                  v-model="editorForm.category"
+                  type="text"
+                  placeholder="自定..."
+                  class="cat-custom-input"
+                />
+              </div>
             </div>
+
             <div class="capsule-divider"></div>
+
+            <!-- 路径 Slug -->
             <div class="capsule-item">
               <span class="capsule-label">🔗 Slug</span>
-              <input v-model="editorForm.slug" type="text" required placeholder="url-slug" class="capsule-input" />
+              <input v-model="editorForm.slug" type="text" required placeholder="url-slug" class="capsule-input slug-input" />
             </div>
+
             <div class="capsule-divider"></div>
+
+            <!-- 发布日期 -->
             <div class="capsule-item">
               <span class="capsule-label">📅 日期</span>
               <input v-model="editorForm.date" type="date" required class="capsule-input date-input" />
             </div>
+
             <div class="capsule-divider"></div>
+
+            <!-- 动态 Tag 胶囊输入盒 -->
             <div class="capsule-item flex-tags">
               <span class="capsule-label">🏷️ 标签</span>
-              <input v-model="editorForm.tagsInput" type="text" placeholder="逗号分隔" class="capsule-input" />
+              <div class="tags-chip-container">
+                <span
+                  v-for="(t, i) in tagsList"
+                  :key="i"
+                  class="tag-pill-badge"
+                >
+                  {{ t }}
+                  <button type="button" class="tag-del-btn" @click.stop="removeTag(i)">×</button>
+                </span>
+                <input
+                  v-model="tagInputVal"
+                  type="text"
+                  placeholder="+ 标签(回车)"
+                  class="tag-live-input"
+                  @keydown="handleTagKeydown"
+                  @blur="addTag"
+                />
+              </div>
             </div>
           </div>
 
@@ -262,6 +306,37 @@ const isSaving = ref(false)
 const saveError = ref('')
 const currentEditSlug = ref('')
 
+const commonCategories = [
+  { key: 'dev', label: '💻 编程工程' },
+  { key: 'mind', label: '🧠 认知心理' },
+  { key: 'thoughts', label: '💡 沉思杂谈' },
+  { key: 'history', label: '🏛️ 古典史诗' }
+]
+
+const tagInputVal = ref('')
+const tagsList = ref([])
+
+function addTag() {
+  const val = tagInputVal.value.trim().replace(/^,+|,+$/g, '')
+  if (val && !tagsList.value.includes(val)) {
+    tagsList.value.push(val)
+  }
+  tagInputVal.value = ''
+}
+
+function removeTag(index) {
+  tagsList.value.splice(index, 1)
+}
+
+function handleTagKeydown(e) {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault()
+    addTag()
+  } else if (e.key === 'Backspace' && !tagInputVal.value && tagsList.value.length > 0) {
+    tagsList.value.pop()
+  }
+}
+
 const editorForm = reactive({
   title: '',
   slug: '',
@@ -277,6 +352,8 @@ function openCreateModal() {
   isEditing.value = false
   saveError.value = ''
   currentEditSlug.value = ''
+  tagInputVal.value = ''
+  tagsList.value = []
   Object.assign(editorForm, {
     title: '',
     slug: '',
@@ -294,6 +371,8 @@ async function openEditModal(post) {
   isEditing.value = true
   saveError.value = ''
   currentEditSlug.value = post.slug
+  tagInputVal.value = ''
+  tagsList.value = Array.isArray(post.tags) ? [...post.tags] : (post.tags ? String(post.tags).split(/[,，]/).map(s => s.trim()).filter(Boolean) : [])
   showModal.value = true
 
   // 先用列表简要信息填表
@@ -302,16 +381,19 @@ async function openEditModal(post) {
     slug: post.slug,
     category: post.category || 'dev',
     date: post.date,
-    tagsInput: (post.tags || []).join(', '),
+    tagsInput: '',
     excerpt: post.excerpt || '',
     content: '',
-    isFeatured: Boolean(post.isFeatured)
+    isFeatured: Boolean(post.is_featured || post.isFeatured)
   })
 
   // 异步获取完整正文
   try {
     const full = await adminApi.getPostDetail(post.slug)
     editorForm.content = full.content || ''
+    if (Array.isArray(full.tags) && full.tags.length > 0) {
+      tagsList.value = [...full.tags]
+    }
   } catch (err) {
     console.error('拉取正文失败:', err)
   }
@@ -325,17 +407,17 @@ async function savePost() {
   saveError.value = ''
   isSaving.value = true
 
-  const tags = editorForm.tagsInput
-    .split(/[,，]/)
-    .map(t => t.trim())
-    .filter(Boolean)
+  // 如果输入框还有没按回车的标签，自动收纳
+  if (tagInputVal.value.trim()) {
+    addTag()
+  }
 
   const payload = {
     title: editorForm.title,
     slug: editorForm.slug,
     category: editorForm.category,
     date: editorForm.date,
-    tags,
+    tags: tagsList.value,
     excerpt: editorForm.excerpt,
     content: editorForm.content,
     isFeatured: editorForm.isFeatured
@@ -785,11 +867,12 @@ onMounted(() => {
 .capsule-meta-bar {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
-  padding: 4px 10px;
-  gap: 8px;
+  padding: 6px 12px;
+  gap: 10px;
 }
 .capsule-item {
   display: flex;
@@ -801,29 +884,104 @@ onMounted(() => {
   color: #64748b;
   white-space: nowrap;
 }
+
+/* 分类胶囊按钮组 */
+.cat-pill-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.cat-chip-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.cat-chip-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+}
+.cat-chip-btn.active {
+  background: rgba(212, 163, 89, 0.2);
+  border-color: rgba(212, 163, 89, 0.6);
+  color: #f1c40f;
+  font-weight: 600;
+}
+.cat-custom-input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.2);
+  color: #e2e8f0;
+  font-size: 11px;
+  width: 50px;
+  padding: 1px 2px;
+  outline: none;
+}
+
 .capsule-input {
   background: transparent;
   border: none;
   color: #e2e8f0;
   font-size: 12px;
   outline: none;
-  width: 90px;
   font-family: inherit;
 }
+.capsule-input.slug-input {
+  width: 120px;
+}
 .capsule-input.date-input {
-  width: 115px;
+  width: 105px;
   color-scheme: dark;
-}
-.flex-tags {
-  flex: 1;
-}
-.flex-tags .capsule-input {
-  width: 100%;
 }
 .capsule-divider {
   width: 1px;
   height: 16px;
   background: rgba(255, 255, 255, 0.1);
+}
+
+/* 动态 Tag Chip 容器 */
+.tags-chip-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.tag-pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: #38bdf8;
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+.tag-del-btn {
+  background: transparent;
+  border: none;
+  color: #38bdf8;
+  font-size: 12px;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+  opacity: 0.7;
+}
+.tag-del-btn:hover {
+  opacity: 1;
+}
+.tag-live-input {
+  background: transparent;
+  border: none;
+  color: #e2e8f0;
+  font-size: 11px;
+  outline: none;
+  width: 80px;
 }
 
 /* 极简单行摘要 */
