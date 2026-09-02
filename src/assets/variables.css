@@ -17,14 +17,29 @@
 
 /* ===== 浅色：古典纸质浮雕 ===== */
 :root.light {
-  --bg-primary: #F5F5F0;
-  --bg-card: #FFFFFF;
+  --bg-primary: #F2ECDF; /* 仿纸质米白底（明显暖调） */
+  --bg-card: #FBF7EE;    /* 卡片米白（不再刺眼的纯白） */
   --text-primary: #1C1917;
   --text-secondary: #78716C;
   --border-color: rgba(28, 25, 23, 0.08);
   --shadow-emboss: inset 0 1px 2px rgba(255, 255, 255, 0.8), 0 2px 8px rgba(0, 0, 0, 0.04);
   --accent: #8b5cf6;
   --hero-bg: linear-gradient(180deg, #fbfaf6 0%, #f5f5f0 100%);
+  --nav-frost-alpha: 40%; /* 导航栏毛玻璃不透明度（浅色主题更透） */
+  /* 黏糊糊导航：亮条（浅底深字 + 深 pill，darken 混合） */
+  --gooey-bar-bg: rgba(255, 255, 255, 0.88);
+  --gooey-bar-border: rgba(28, 25, 23, 0.12);
+  --gooey-bar-shadow: 0 8px 28px rgba(28, 25, 23, 0.1);
+  --gooey-text: #1C1917;
+  --gooey-text-shadow: 0 1px 1px rgba(255, 255, 255, 0.4);
+  --gooey-pill: #1C1917;
+  --gooey-pill-contrast: #FFFFFF;
+  --gooey-blend: darken;
+  --gooey-filter-bg: #FFFFFF;
+  --gooey-color-1: #1C1917;
+  --gooey-color-2: #7C3AED;
+  --gooey-color-3: #0F766E;
+  --gooey-color-4: #B45309;
 }
 
 /* ===== 深色：深空神秘 ===== */
@@ -37,16 +52,46 @@
   --shadow-emboss: 0 4px 20px rgba(0, 0, 0, 0.4);
   --accent: #a78bfa;
   --hero-bg: #0C0E12;
+  --nav-frost-alpha: 68%; /* 导航栏毛玻璃不透明度（深色主题） */
+  /* 黏糊糊导航：暗条（深底浅字 + 白 pill，lighten 混合） */
+  --gooey-bar-bg: rgba(21, 24, 30, 0.88);
+  --gooey-bar-border: rgba(255, 255, 255, 0.12);
+  --gooey-bar-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+  --gooey-text: #F3F4F6;
+  --gooey-text-shadow: 0 1px 1px hsl(205deg 30% 10% / 0.2);
+  --gooey-pill: #FFFFFF;
+  --gooey-pill-contrast: #0C0E12;
+  --gooey-blend: lighten;
+  --gooey-filter-bg: #000000;
+  --gooey-color-1: #FFFFFF;
+  --gooey-color-2: #A78BFA;
+  --gooey-color-3: #38BDF8;
+  --gooey-color-4: #F472B6;
 }
 
 /* 默认浅色（未挂 class 时兜底） */
 :root {
-  --bg-primary: #F5F5F0;
-  --bg-card: #FFFFFF;
+  --bg-primary: #F2ECDF; /* 仿纸质米白底（明显暖调） */
+  --bg-card: #FBF7EE;    /* 卡片米白（不再刺眼的纯白） */
   --text-primary: #1C1917;
   --text-secondary: #78716C;
   --border-color: rgba(28, 25, 23, 0.08);
   --shadow-emboss: inset 0 1px 2px rgba(255, 255, 255, 0.8), 0 2px 8px rgba(0, 0, 0, 0.04);
   --accent: #8b5cf6;
   --hero-bg: linear-gradient(180deg, #fbfaf6 0%, #f5f5f0 100%);
+  --nav-frost-alpha: 40%; /* 导航栏毛玻璃不透明度（浅色主题更透） */
+  /* 黏糊糊导航：默认（未挂 class 时走亮条） */
+  --gooey-bar-bg: rgba(255, 255, 255, 0.88);
+  --gooey-bar-border: rgba(28, 25, 23, 0.12);
+  --gooey-bar-shadow: 0 8px 28px rgba(28, 25, 23, 0.1);
+  --gooey-text: #1C1917;
+  --gooey-text-shadow: 0 1px 1px rgba(255, 255, 255, 0.4);
+  --gooey-pill: #1C1917;
+  --gooey-pill-contrast: #FFFFFF;
+  --gooey-blend: darken;
+  --gooey-filter-bg: #FFFFFF;
+  --gooey-color-1: #1C1917;
+  --gooey-color-2: #7C3AED;
+  --gooey-color-3: #0F766E;
+  --gooey-color-4: #B45309;
 }
