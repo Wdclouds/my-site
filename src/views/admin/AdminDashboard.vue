@@ -159,10 +159,10 @@
             />
           </div>
 
-          <!-- 交互式单行胶囊元数据栏 (Category / Slug / Date / Tags 全部交互标签化) -->
+          <!-- 交互式单行胶囊元数据栏 (对齐整洁 · 分区明确 · 不折行错位) -->
           <div class="capsule-meta-bar">
-            <!-- 分类选择胶囊 -->
-            <div class="capsule-item cat-selector">
+            <!-- 左侧：分类选择胶囊 -->
+            <div class="capsule-section cat-sec">
               <span class="capsule-label">📁 分类</span>
               <div class="cat-pill-group">
                 <button
@@ -186,25 +186,23 @@
 
             <div class="capsule-divider"></div>
 
-            <!-- 路径 Slug -->
-            <div class="capsule-item">
-              <span class="capsule-label">🔗 Slug</span>
-              <input v-model="editorForm.slug" type="text" required placeholder="url-slug" class="capsule-input slug-input" />
+            <!-- 中间：路径 Slug 与 发布日期 -->
+            <div class="capsule-section meta-slug-date">
+              <div class="capsule-item">
+                <span class="capsule-label">🔗</span>
+                <input v-model="editorForm.slug" type="text" required placeholder="url-slug" class="capsule-input slug-input" />
+              </div>
+              <div class="capsule-item">
+                <span class="capsule-label">📅</span>
+                <input v-model="editorForm.date" type="date" required class="capsule-input date-input" />
+              </div>
             </div>
 
             <div class="capsule-divider"></div>
 
-            <!-- 发布日期 -->
-            <div class="capsule-item">
-              <span class="capsule-label">📅 日期</span>
-              <input v-model="editorForm.date" type="date" required class="capsule-input date-input" />
-            </div>
-
-            <div class="capsule-divider"></div>
-
-            <!-- 动态 Tag 胶囊输入盒 -->
-            <div class="capsule-item flex-tags">
-              <span class="capsule-label">🏷️ 标签</span>
+            <!-- 右侧：动态 Tag Chip 胶囊输入盒 (自动填充剩余空间) -->
+            <div class="capsule-section tags-sec">
+              <span class="capsule-label">🏷️</span>
               <div class="tags-chip-container">
                 <span
                   v-for="(t, i) in tagsList"
@@ -217,7 +215,7 @@
                 <input
                   v-model="tagInputVal"
                   type="text"
-                  placeholder="+ 标签(回车)"
+                  placeholder="+标签(回车)"
                   class="tag-live-input"
                   @keydown="handleTagKeydown"
                   @blur="addTag"
@@ -863,21 +861,39 @@ onMounted(() => {
   color: #475569;
 }
 
-/* 单行胶囊元数据栏 */
+/* 单行胶囊元数据栏 (弹性分区 · 严禁折行错位) */
 .capsule-meta-bar {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
-  padding: 6px 12px;
-  gap: 10px;
+  padding: 5px 12px;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
 }
-.capsule-item {
+
+.capsule-section {
   display: flex;
   align-items: center;
   gap: 6px;
+  flex-shrink: 0;
+}
+.capsule-section.meta-slug-date {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.capsule-section.tags-sec {
+  flex: 1;
+  min-width: 0;
+}
+
+.capsule-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 .capsule-label {
   font-size: 11px;
@@ -896,8 +912,8 @@ onMounted(() => {
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: #94a3b8;
   font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 12px;
+  padding: 2px 7px;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.15s;
   white-space: nowrap;
@@ -918,7 +934,7 @@ onMounted(() => {
   border-bottom: 1px dashed rgba(255, 255, 255, 0.2);
   color: #e2e8f0;
   font-size: 11px;
-  width: 50px;
+  width: 46px;
   padding: 1px 2px;
   outline: none;
 }
@@ -932,24 +948,30 @@ onMounted(() => {
   font-family: inherit;
 }
 .capsule-input.slug-input {
-  width: 120px;
+  width: 100px;
 }
 .capsule-input.date-input {
-  width: 105px;
+  width: 100px;
   color-scheme: dark;
 }
 .capsule-divider {
   width: 1px;
-  height: 16px;
+  height: 14px;
   background: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
 }
 
 /* 动态 Tag Chip 容器 */
 .tags-chip-container {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
   gap: 4px;
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tags-chip-container::-webkit-scrollbar {
+  display: none;
 }
 .tag-pill-badge {
   display: inline-flex;
@@ -961,6 +983,8 @@ onMounted(() => {
   font-size: 11px;
   padding: 1px 6px;
   border-radius: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .tag-del-btn {
   background: transparent;
@@ -981,7 +1005,8 @@ onMounted(() => {
   color: #e2e8f0;
   font-size: 11px;
   outline: none;
-  width: 80px;
+  flex: 1;
+  min-width: 60px;
 }
 
 /* 极简单行摘要 */
