@@ -22,7 +22,7 @@
       <router-link
         v-for="p in posts"
         :key="p.id"
-        :to="`/blog/posts/${p.id}`"
+        :to="`/blog/posts/${p.slug || p.id}`"
         class="post-row"
       >
         <div class="pr-meta">

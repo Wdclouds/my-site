@@ -41,14 +41,35 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { blogState } from '../../../stores/blogState'
 
 const props = defineProps({ slug: { type: String, default: '' } })
 
-const post = computed(() =>
-  blogState.posts.find(p => String(p.id) === String(props.slug))
-)
+const fetchedPost = ref(null)
+const isLoading = ref(false)
+
+const post = computed(() => {
+  return blogState.posts.find(p => p.slug === props.slug || String(p.id) === String(props.slug)) || fetchedPost.value
+})
+
+async function fetchCurrentPost() {
+  if (!props.slug) return
+  isLoading.value = true
+  try {
+    const res = await fetch(`/api/posts/${props.slug}`)
+    if (res.ok) {
+      fetchedPost.value = await res.json()
+    }
+  } catch (err) {
+    console.warn('[MobilePost] 获取单篇文章失败:', err)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(fetchCurrentPost)
+watch(() => props.slug, fetchCurrentPost)
 </script>
 
 <style scoped>

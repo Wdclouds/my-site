@@ -24,7 +24,7 @@
         <router-link
           v-for="p in featured"
           :key="p.id"
-          :to="`/blog/posts/${p.id}`"
+          :to="`/blog/posts/${p.slug || p.id}`"
           class="post-card"
         >
           <div class="pc-meta">
@@ -43,7 +43,7 @@
         <router-link
           v-for="p in g.list"
           :key="p.id"
-          :to="`/blog/posts/${p.id}`"
+          :to="`/blog/posts/${p.slug || p.id}`"
           class="arch-row"
         >
           <span class="row-date">{{ p.date.slice(5) }}</span>
