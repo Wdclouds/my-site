@@ -49,80 +49,87 @@
       </div>
     </div>
 
-    <!-- 2. 已登录：全功能文章增删查改管理工作台 -->
+    <!-- 2. 已登录：雅典娜神庙 · 铭文圣所 (去模块化 · 古典极简长卷) -->
     <div v-else class="console-wrapper">
-      <header class="console-header">
-        <div class="header-left">
-          <span class="stele-badge">🏛️ ATHENA STELE CONSOLE</span>
-          <h1>铭文管理工作台</h1>
-          <p class="welcome-text">欢迎归来，守护者 <strong>{{ authState.user?.username }}</strong></p>
+      <!-- 圣所顶部典雅仪式区 -->
+      <header class="sanctum-hero">
+        <div class="sanctum-crest">
+          <span class="stele-glyph">🏛️</span>
+          <span class="sanctum-sub">ATHENA SANCTUM · 铭文法典台</span>
         </div>
-        <div class="header-actions">
-          <router-link to="/blog" class="btn-secondary">查看前台</router-link>
-          <button @click="openCreateModal" class="btn-primary">+ 撰写新铭文</button>
-          <button @click="handleLogout" class="btn-danger-outline">退出登录</button>
+        <h1 class="sanctum-title">雅典娜的智慧之卷</h1>
+        <p class="sanctum-motto">“于石碑之上镌刻思绪，于岁月之中见证真理。”</p>
+
+        <!-- 极简轻量指标行 (无生硬盒子 · 纯粹流式信息) -->
+        <div class="sanctum-meta-strip">
+          <span class="meta-leaf">📜 <strong>{{ posts.length }}</strong> 篇铭文</span>
+          <span class="meta-dot">·</span>
+          <span class="meta-leaf">★ <strong>{{ featuredCount }}</strong> 篇置顶</span>
+          <span class="meta-dot">·</span>
+          <span class="meta-leaf">🏛️ <strong>{{ uniqueCategories.length }}</strong> 大领域</span>
+          <span class="meta-dot">·</span>
+          <span class="meta-leaf user-leaf">守护者: <strong>{{ authState.user?.username }}</strong></span>
+        </div>
+
+        <div class="sanctum-actions">
+          <button @click="openCreateModal" class="btn-sanctum-primary">+ 镌刻新铭文</button>
+          <router-link to="/blog" class="btn-sanctum-ghost">浏览公开神庙 ➔</router-link>
+          <button @click="handleLogout" class="btn-sanctum-text">退出圣所</button>
         </div>
       </header>
 
-      <!-- 文章统计与筛选 -->
-      <section class="stats-bar">
-        <div class="stat-item">
-          <span class="stat-num">{{ posts.length }}</span>
-          <span class="stat-label">已收录铭文</span>
+      <!-- 铭文石刻长卷流 (去表格化 · 古典杂志排版) -->
+      <div class="stele-stream-container">
+        <div class="stream-head">
+          <span>📜 存世铭文编年录</span>
+          <span class="stream-count">共 {{ posts.length }} 卷</span>
         </div>
-        <div class="stat-item">
-          <span class="stat-num">{{ featuredCount }}</span>
-          <span class="stat-label">精选置顶</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-num">{{ uniqueCategories.length }}</span>
-          <span class="stat-label">活跃领域</span>
-        </div>
-      </section>
 
-      <!-- 文章列表表格 -->
-      <div class="table-card">
-        <table class="post-table">
-          <thead>
-            <tr>
-              <th>标题 / 摘要</th>
-              <th>分类</th>
-              <th>标签</th>
-              <th>发布日期</th>
-              <th>置顶</th>
-              <th style="text-align: right;">操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-if="isLoadingList">
-              <td colspan="6" class="empty-cell">正在拉取神庙铭文列表...</td>
-            </tr>
-            <tr v-else-if="posts.length === 0">
-              <td colspan="6" class="empty-cell">暂无收录文章，点击右上角开始撰写第一篇</td>
-            </tr>
-            <tr v-for="p in posts" :key="p.id" class="post-row">
-              <td class="col-title">
-                <div class="post-title">{{ p.title }}</div>
-                <div class="post-slug">{{ p.slug }}</div>
-              </td>
-              <td><span class="category-pill">{{ p.category || 'dev' }}</span></td>
-              <td>
-                <div class="tag-list">
-                  <span v-for="t in (p.tags || [])" :key="t" class="tag-pill">#{{ t }}</span>
+        <div v-if="isLoadingList" class="stream-loading">
+          正在自神庙深处调取铭文碑记...
+        </div>
+
+        <div v-else-if="posts.length === 0" class="stream-empty">
+          神庙碑座尚无铭文，点击上方「+ 镌刻新铭文」开启第一卷智慧。
+        </div>
+
+        <div v-else class="stream-list">
+          <div
+            v-for="p in posts"
+            :key="p.id"
+            class="stream-item"
+          >
+            <!-- 左侧：古典日期与置顶徽章 -->
+            <div class="item-time-col">
+              <span class="item-date">{{ p.date }}</span>
+              <span v-if="p.isFeatured" class="featured-star" title="神庙精选置顶">★ 精选</span>
+            </div>
+
+            <!-- 中间：铭文核心信息 -->
+            <div class="item-body-col">
+              <div class="item-title-row">
+                <span class="item-title" @click="openEditModal(p)">{{ p.title }}</span>
+                <span class="item-cat-tag">{{ p.category || 'dev' }}</span>
+              </div>
+              <div class="item-slug-row">
+                <span class="item-slug">/blog/posts/{{ p.slug }}</span>
+                <div v-if="p.tags && p.tags.length" class="item-tags-wrap">
+                  <span v-for="t in p.tags" :key="t" class="item-tag-pill">#{{ t }}</span>
                 </div>
-              </td>
-              <td class="col-date">{{ p.date }}</td>
-              <td>
-                <span v-if="p.isFeatured" class="featured-badge">★ 置顶</span>
-                <span v-else class="normal-badge">-</span>
-              </td>
-              <td class="col-actions">
-                <button @click="openEditModal(p)" class="btn-edit">编辑</button>
-                <button @click="confirmDelete(p)" class="btn-del">删除</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+              </div>
+            </div>
+
+            <!-- 右侧：悬浮隐现极简操作 -->
+            <div class="item-action-col">
+              <button @click="openEditModal(p)" class="btn-item-edit" title="修葺铭文">
+                <span>✎ 编辑</span>
+              </button>
+              <button @click="confirmDelete(p)" class="btn-item-del" title="自石碑抹除">
+                <span>✕ 抹除</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -476,44 +483,47 @@ onMounted(() => {
   pointer-events: none;
 }
 
-/* 登录卡 */
+/* 登录卡 (古希腊神庙准入石门) */
 .login-wrapper {
-  max-width: 440px;
-  margin: 100px auto 0;
+  max-width: 420px;
+  margin: 120px auto 0;
   position: relative;
   z-index: 10;
 }
 .login-card {
-  background: rgba(22, 27, 34, 0.85);
-  border: 1px solid rgba(212, 163, 89, 0.25);
-  backdrop-filter: blur(16px);
-  border-radius: 12px;
-  padding: 36px 32px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+  background: rgba(15, 20, 28, 0.75);
+  border: 1px solid rgba(212, 163, 89, 0.3);
+  backdrop-filter: blur(24px);
+  border-radius: 16px;
+  padding: 44px 36px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(212, 163, 89, 0.06);
 }
 .stele-header {
   text-align: center;
-  margin-bottom: 28px;
+  margin-bottom: 32px;
 }
 .stele-badge {
   display: inline-block;
-  font-size: 11px;
-  letter-spacing: 2px;
+  font-size: 10px;
+  letter-spacing: 3px;
   color: #d4a359;
   text-transform: uppercase;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   font-weight: 600;
 }
 .stele-header h2 {
-  font-size: 22px;
+  font-size: 24px;
   color: #f8fafc;
-  margin: 0 0 6px;
-  font-weight: 600;
+  margin: 0 0 8px;
+  font-weight: 400;
+  font-family: var(--font-serif, "Cinzel", "Noto Serif SC", serif);
+  letter-spacing: 1px;
 }
 .subtitle {
   font-size: 13px;
   color: #94a3b8;
   margin: 0;
+  font-style: italic;
 }
 
 /* 表单通用 */
@@ -628,122 +638,294 @@ onMounted(() => {
 }
 .back-link:hover { color: #d4a359; }
 
-/* 工作台布局 */
+/* 工作台布局 (古希腊神庙圣所 · 去模块化) */
 .console-wrapper {
-  max-width: 1100px;
+  max-width: 960px;
   margin: 0 auto;
   position: relative;
   z-index: 10;
+  padding-bottom: 80px;
 }
-.console-header {
+
+/* 顶部典雅仪式区 */
+.sanctum-hero {
+  text-align: center;
+  padding: 40px 20px 32px;
+  margin-bottom: 28px;
+  border-bottom: 1px solid rgba(212, 163, 89, 0.15);
+}
+.sanctum-crest {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.stele-glyph {
+  font-size: 18px;
+}
+.sanctum-sub {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: #d4a359;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.sanctum-title {
+  font-size: 32px;
+  color: #f8fafc;
+  margin: 0 0 8px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  font-family: var(--font-serif, "Cinzel", "Noto Serif SC", serif);
+}
+.sanctum-motto {
+  font-size: 13px;
+  color: #94a3b8;
+  font-style: italic;
+  margin: 0 0 20px;
+}
+
+/* 极简轻量指标行 (去盒子化) */
+.sanctum-meta-strip {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 6px 18px;
+  border-radius: 20px;
+  margin-bottom: 24px;
+}
+.meta-leaf {
+  font-size: 12px;
+  color: #cbd5e1;
+}
+.meta-leaf strong {
+  color: #d4a359;
+  font-weight: 600;
+}
+.meta-leaf.user-leaf strong {
+  color: #f1c40f;
+}
+.meta-dot {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+/* 圣所核心操作按钮 */
+.sanctum-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+.btn-sanctum-primary {
+  background: linear-gradient(135deg, #d4a359, #b8860b);
+  color: #0f172a;
+  border: none;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 8px 22px;
+  border-radius: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(212, 163, 89, 0.25);
+  transition: all 0.2s;
+}
+.btn-sanctum-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(212, 163, 89, 0.35);
+}
+.btn-sanctum-ghost {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+  font-size: 13px;
+  padding: 8px 18px;
+  border-radius: 20px;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.btn-sanctum-ghost:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(212, 163, 89, 0.4);
+  color: #f8fafc;
+}
+.btn-sanctum-text {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 8px 12px;
+  transition: color 0.2s;
+}
+.btn-sanctum-text:hover {
+  color: #ef4444;
+}
+
+/* 铭文石刻长卷流 (去表格化) */
+.stele-stream-container {
+  background: rgba(15, 20, 28, 0.6);
+  border: 1px solid rgba(212, 163, 89, 0.2);
+  backdrop-filter: blur(16px);
+  border-radius: 12px;
+  padding: 24px 30px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+.stream-head {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 24px;
-  padding-bottom: 20px;
+  align-items: center;
+  font-size: 13px;
+  color: #94a3b8;
+  font-weight: 500;
+  padding-bottom: 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  letter-spacing: 0.5px;
 }
-.console-header h1 {
-  font-size: 28px;
-  color: #f8fafc;
-  margin: 4px 0 6px;
-}
-.welcome-text {
-  font-size: 13px;
-  color: #94a3b8;
-  margin: 0;
-}
-.header-actions {
-  display: flex;
-  gap: 12px;
-}
-.header-actions .btn-primary { width: auto; }
-
-/* 状态条 */
-.stats-bar {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-bottom: 24px;
-}
-.stat-item {
-  background: rgba(22, 27, 34, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  padding: 16px 20px;
-}
-.stat-num {
-  display: block;
-  font-size: 24px;
-  font-weight: 700;
-  color: #d4a359;
-}
-.stat-label {
-  font-size: 12px;
-  color: #94a3b8;
-}
-
-/* 表格 */
-.table-card {
-  background: rgba(22, 27, 34, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.stream-count {
+  font-size: 11px;
+  color: #64748b;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 2px 8px;
   border-radius: 10px;
-  overflow: hidden;
 }
-.post-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-}
-.post-table th {
-  background: rgba(13, 17, 23, 0.9);
-  padding: 12px 16px;
-  font-size: 12px;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-.post-table td {
-  padding: 14px 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  font-size: 13px;
-}
-.post-title {
-  font-weight: 600;
-  color: #f1f5f9;
+.stream-loading,
+.stream-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #64748b;
   font-size: 14px;
 }
-.post-slug {
+
+/* 铭文行条目 */
+.stream-item {
+  display: flex;
+  align-items: center;
+  padding: 16px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.2s;
+  gap: 16px;
+}
+.stream-item:last-child {
+  border-bottom: none;
+}
+.stream-item:hover {
+  background: rgba(212, 163, 89, 0.03);
+  padding-left: 14px;
+  border-radius: 6px;
+}
+
+/* 日期与置顶 */
+.item-time-col {
+  width: 110px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.item-date {
   font-size: 12px;
   color: #64748b;
-  font-family: monospace;
+  font-family: ui-monospace, monospace;
 }
-.category-pill {
-  background: rgba(212, 163, 89, 0.12);
-  color: #d4a359;
-  border: 1px solid rgba(212, 163, 89, 0.25);
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-}
-.tag-pill {
-  background: rgba(255, 255, 255, 0.06);
-  color: #cbd5e1;
-  padding: 2px 6px;
-  border-radius: 3px;
-  font-size: 11px;
-  margin-right: 4px;
-}
-.featured-badge {
+.featured-star {
+  font-size: 10px;
   color: #fbbf24;
-  font-size: 12px;
   font-weight: 600;
 }
-.col-actions { text-align: right; }
-.empty-cell {
-  text-align: center;
-  padding: 40px !important;
-  color: #64748b;
+
+/* 铭文内容 */
+.item-body-col {
+  flex: 1;
+  min-width: 0;
+}
+.item-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.item-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #f1f5f9;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.item-title:hover {
+  color: #d4a359;
+}
+.item-cat-tag {
+  background: rgba(212, 163, 89, 0.12);
+  border: 1px solid rgba(212, 163, 89, 0.25);
+  color: #d4a359;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.item-slug-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.item-slug {
+  font-size: 11px;
+  color: #475569;
+  font-family: ui-monospace, monospace;
+}
+.item-tags-wrap {
+  display: flex;
+  gap: 4px;
+}
+.item-tag-pill {
+  font-size: 10px;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.08);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+/* 操作按钮 */
+.item-action-col {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.4;
+  transition: opacity 0.2s;
+}
+.stream-item:hover .item-action-col {
+  opacity: 1;
+}
+.btn-item-edit {
+  background: rgba(212, 163, 89, 0.1);
+  border: 1px solid rgba(212, 163, 89, 0.25);
+  color: #d4a359;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-item-edit:hover {
+  background: rgba(212, 163, 89, 0.25);
+  color: #f1c40f;
+}
+.btn-item-del {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-item-del:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
 }
 
 /* 沉浸式写作模态框 */
