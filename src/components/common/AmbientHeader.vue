@@ -17,16 +17,22 @@
         >{{ link.label }}</RouterLink>
       </nav>
 
-      <!-- 右：昼夜切换小按钮（只有博客页保留白天黑夜） -->
-      <button
-        v-if="canToggleTheme"
-        class="theme-toggle"
-        :aria-label="blogState.theme === 'dark' ? '切换到亮色' : '切换到暗色'"
-        :title="blogState.theme === 'dark' ? '切换到亮色' : '切换到暗色'"
-        @click="toggleThemeAnimated"
-      >
-        <span class="theme-icon">{{ blogState.theme === 'dark' ? '🌙' : '☀️' }}</span>
-      </button>
+      <!-- 右：管理员入口 + 昼夜切换小按钮 -->
+      <div class="header-right">
+        <RouterLink v-if="authState.isLoggedIn" to="/admin" class="admin-badge" title="管理工作台">
+          <span class="admin-icon">🏛️</span>
+        </RouterLink>
+
+        <button
+          v-if="canToggleTheme"
+          class="theme-toggle"
+          :aria-label="blogState.theme === 'dark' ? '切换到亮色' : '切换到暗色'"
+          :title="blogState.theme === 'dark' ? '切换到亮色' : '切换到暗色'"
+          @click="toggleThemeAnimated"
+        >
+          <span class="theme-icon">{{ blogState.theme === 'dark' ? '🌙' : '☀️' }}</span>
+        </button>
+      </div>
     </div>
   </header>
 </template>
@@ -35,6 +41,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { blogState, toggleTheme } from '../../stores/blogState'
+import { authState } from '../../stores/authState'
 
 // ===== 主站导航：主页 / 博客 / 音乐 / 实验室 =====
 const links = [
@@ -178,6 +185,32 @@ onBeforeUnmount(() => {
 }
 .nav-link:hover { color: var(--text-primary); }
 .nav-link.active { color: var(--text-primary); font-weight: 600; }
+
+/* 右：管理员入口 + 昼夜切换 */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(212, 163, 89, 0.15);
+  border: 1px solid rgba(212, 163, 89, 0.35);
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.admin-badge:hover {
+  transform: scale(1.08);
+  background: rgba(212, 163, 89, 0.25);
+}
 
 /* 右：昼夜切换小按钮 */
 .theme-toggle {

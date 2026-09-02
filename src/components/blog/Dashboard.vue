@@ -1,47 +1,49 @@
 <template>
   <section class="dashboard">
-    <!-- ══════════ 六块网格卡片 ══════════ -->
+    <!-- ══════════ 古希腊神庙风格：三块神谕与石刻卡片 ══════════ -->
     <div class="dash-grid">
-      <!-- 1 号位：个人名片与联络（点击放大） -->
-      <article class="dash-card card-about" :ref="el => setCardRef('about', el)" @click="openCard('about')">
+      <!-- 1 号位：石碑自传入口 -->
+      <article class="dash-card card-info" :ref="el => setCardRef('about', el)" @click="openCard('about')">
         <span class="card-expand" aria-hidden="true">⤢</span>
-        <div class="about-top">
-          <div class="avatar">
-            <slot name="avatar">
-              <img v-if="avatarSrc" :src="avatarSrc" :alt="name" class="avatar-img" />
-              <span v-else class="avatar-text">{{ avatarText }}</span>
-            </slot>
+        <div class="card-badge">🏛️ STELE · 守夜人铭文</div>
+        <div class="info-user">
+          <div class="user-name">{{ name }}</div>
+          <div class="user-role">雅典娜神庙的工匠与思考者</div>
+        </div>
+        <div class="user-links" @click.stop>
+          <a href="https://github.com/Wdclouds" target="_blank" rel="noopener" title="GitHub">GitHub</a>
+          <span class="sep">/</span>
+          <a href="/rss.xml" title="RSS">RSS</a>
+          <span class="sep">/</span>
+          <a href="mailto:hello@feagle.site" title="信件传递">信件</a>
+        </div>
+      </article>
+
+      <!-- 2 号位：雅典学宫专栏典籍 -->
+      <article class="dash-card card-info" :ref="el => setCardRef('index', el)" @click="openCard('index')">
+        <span class="card-expand" aria-hidden="true">⤢</span>
+        <div class="card-badge">📜 SCROLLS · 雅典典籍</div>
+        <ul class="topic-list">
+          <li><span class="dot"></span> Three.js 3D 全景实战</li>
+          <li><span class="dot"></span> 认知心理与行为设计</li>
+        </ul>
+        <div class="card-footer-tip">翻阅 2 卷智慧画廊 <span class="arr">→</span></div>
+      </article>
+
+      <!-- 3 号位：卫城集市与演进脉搏 -->
+      <article class="dash-card card-info" :ref="el => setCardRef('stats', el)" @click="openCard('stats')">
+        <span class="card-expand" aria-hidden="true">⤢</span>
+        <div class="card-badge">🕊️ AGORA · 卫城站台</div>
+        <div class="stats-metrics">
+          <div class="metric-row">
+            <span class="m-val">3</span><span class="m-label">篇铭文</span>
+            <span class="m-sep">·</span>
+            <span class="m-val">2</span><span class="m-label">卷典籍</span>
           </div>
-          <h3 class="name-en">{{ name }}</h3>
-          <p class="slogan">{{ slogan }}</p>
+          <div class="metric-date">最近镌刻 · 2026-09-01</div>
         </div>
-        <div class="socials">
-          <a href="https://github.com/Wdclouds" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub">
-            <svg viewBox="0 0 16 16" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
-          </a>
-          <a href="/rss.xml" aria-label="RSS" title="RSS">
-            <svg viewBox="0 0 16 16" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M2.13 5.87A8 8 0 0 1 10.13 13.87H7.87A5.75 5.75 0 0 0 2.13 8.13V5.87ZM2 13a2 2 0 1 1 2 2 2 2 0 0 1-2-2Zm.13-9.12A11.25 11.25 0 0 1 13.25 15H10.5A8.5 8.5 0 0 0 2.13 6.63V3.88Z"/></svg>
-          </a>
-          <a href="mailto:hello@feagle.site" aria-label="邮箱" title="邮箱">
-            <svg viewBox="0 0 16 16" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-.5a.5.5 0 0 0-.5.5v.46l6.5 5.08L14.5 4.46V4a.5.5 0 0 0-.5-.5H2Zm12.5 2.28-5.9 4.6a1 1 0 0 1-1.2 0l-5.9-4.6V12a.5.5 0 0 0 .5.5h12a.5.5 0 0 0 .5-.5V5.78Z"/></svg>
-          </a>
-        </div>
-        <router-link to="/blog" class="about-link">关于我 <span class="arr">→</span></router-link>
+        <div class="card-footer-tip">观测卫城编年史 <span class="arr">→</span></div>
       </article>
-
-      <!-- 2 号位：知识库（图片即卡片，点击放大 → 画廊） -->
-      <article class="dash-card card-index" :ref="el => setCardRef('index', el)" @click="openCard('index')">
-        <span class="card-expand" aria-hidden="true">⤢</span>
-        <img :src="indexCardImg" alt="知识库" class="card-img" />
-      </article>
-
-      <!-- 3 号位：站台（图片即卡片，点击放大） -->
-      <article class="dash-card card-stats" :ref="el => setCardRef('stats', el)" @click="openCard('stats')">
-        <span class="card-expand" aria-hidden="true">⤢</span>
-        <img :src="statsCardImg" alt="站台" class="card-img" />
-      </article>
-
-
     </div>
 
     <!-- ══════════ 三卡放大弹窗（GSAP 共享布局动画） ══════════ -->
@@ -409,11 +411,130 @@ const stats = computed(() => {
 }
 .card-title .en { font-size: 1.15rem; color: var(--ink-deep); line-height: 1; }
 
-/* 1 号位：名片（大头像 + 竖排 + 垂直均匀分布） */
-.card-about {
+/* ───────── 真实轻量数据卡（现代杂志排版 · 呼吸感 · 无废话） ───────── */
+.card-info {
+  display: flex;
+  flex-direction: column;
   justify-content: space-between;
+  padding: 18px 20px;
+  cursor: pointer;
+  min-height: 145px;
+  text-align: left;
+}
+.card-badge {
+  font-family: var(--font-en);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--ink-deep);
+  opacity: 0.85;
+}
+.info-user {
+  margin: 10px 0 8px;
+}
+.user-name {
+  font-family: var(--font-en);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--ink-deep);
+  line-height: 1.2;
+}
+.user-role {
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin-top: 4px;
+}
+.user-links {
+  display: flex;
   align-items: center;
-  text-align: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.user-links a {
+  color: var(--ink-deep);
+  text-decoration: none;
+  font-weight: 500;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+.user-links a:hover { opacity: 1; text-decoration: underline; }
+.user-links .sep { color: var(--ink-line); font-size: 10px; }
+
+/* 知识库专题列表 */
+.topic-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.topic-list li {
+  font-size: 13px;
+  color: var(--ink-body);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.topic-list .dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--ink-soft);
+  opacity: 0.6;
+}
+
+/* 活跃统计指标 */
+.stats-metrics {
+  margin: 10px 0 8px;
+}
+.metric-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.m-val {
+  font-family: var(--font-en);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--ink-deep);
+  line-height: 1;
+}
+.m-label {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.m-sep {
+  color: var(--ink-line);
+  margin: 0 4px;
+}
+.metric-date {
+  font-size: 11px;
+  color: var(--ink-soft);
+  margin-top: 6px;
+  font-family: var(--font-mono);
+}
+
+/* 底部引导探索提示 */
+.card-footer-tip {
+  font-size: 11px;
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.75;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.card-info:hover .card-footer-tip {
+  opacity: 1;
+  color: var(--ink-deep);
+}
+.card-info:hover .card-footer-tip .arr {
+  transform: translateX(3px);
 }
 .about-top {
   display: flex;
@@ -490,49 +611,7 @@ const stats = computed(() => {
 .arr { transition: transform 0.15s ease; }
 .about-link:hover .arr { transform: translateX(3px); }
 
-/* 知识库 / 站台：图片即卡片，去卡框，图片按自然尺寸 */
-.card-index,
-.card-stats {
-  --hint: '';
-  background: none;
-  border: none;
-  box-shadow: none;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.card-index { --hint: '知识库 · 点击进入'; }
-.card-stats { --hint: '站台 · 点击进入'; }
-.card-img {
-  display: block;
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
-  height: auto;
-  border-radius: 10px; /* 圆角 */
-}
-/* 悬停文字提示 */
-.card-index::after,
-.card-stats::after {
-  content: var(--hint);
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(20, 15, 10, 0.5);
-  color: #F7F2E7;
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.2em;
-  border-radius: 10px;
-  opacity: 0;
-  transition: opacity 0.25s ease;
-  pointer-events: none;
-}
-.card-index:hover::after,
-.card-stats:hover::after { opacity: 1; }
+
 
 /* 2 号位：知识库（画廊入口，点击展开） */
 .card-index { cursor: pointer; }

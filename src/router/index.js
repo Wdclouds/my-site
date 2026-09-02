@@ -7,7 +7,8 @@ const routes = [
   { path: '/music', name: 'music', component: () => import('../views/MusicView.vue') },
   { path: '/lab', name: 'lab', component: () => import('../views/LabView.vue') },
   { path: '/metal', name: 'metal', component: () => import('../views/status/UnderDevView.vue') }, // 待开发占位页预览
-  { path: '/login', name: 'login', component: () => import('../views/LoginView.vue') },
+  { path: '/admin', name: 'admin', component: () => import('../views/admin/AdminDashboard.vue') },
+  { path: '/login', redirect: '/admin' },
   // 404 兜底
   { path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('../views/NotFoundView.vue') }
 ]

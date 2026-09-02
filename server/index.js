@@ -5,6 +5,9 @@ import express from 'express'
 import { connectDB } from './db.js'
 import songsRouter from './routes/songs.js'
 import blogRouter from './blog/blogRoutes.js'
+import authRouter from './auth/authRoutes.js'
+import adminBlogRouter from './blog/adminBlogRoutes.js'
+import { initAuthTables } from './auth/authDb.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -41,11 +44,16 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true, env: process.env.NODE_ENV || 'development' })
 })
 
+// 认证与后台管理路由
+app.use('/api/auth', authRouter)
+app.use('/api/admin', adminBlogRouter)
+
 // 业务路由
 app.use('/api/songs', songsRouter) // 歌曲列表/流派
-// 后续挂载：/api/auth /api/comments ...
 
 const PORT = process.env.PORT || 3000
+
+initAuthTables()
 
 connectDB().then(() => {
   app.listen(PORT, () => {

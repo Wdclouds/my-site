@@ -38,6 +38,10 @@ if (!fs.existsSync(dir)) {
 
 export const db = new DatabaseSync(dbPath)
 
+export function getDb() {
+  return db
+}
+
 // 初始化基础表（防止空库报错）
 db.exec(`
   CREATE TABLE IF NOT EXISTS posts (
