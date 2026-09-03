@@ -1349,13 +1349,13 @@ const stats = computed(() => {
 
 .bronze-overlay {
   position: absolute;
-  top: 12%;
-  left: 7%;
-  width: 56%;          /* 缩短长度，避开右侧青铜浮雕圆环 */
-  bottom: 12%;
+  top: 8%;            /* 👆 上边距：可手动调 (例如 6% ~ 12%) */
+  bottom: 8%;         /* 👇 下边距 */
+  left: 7.5%;         /* 👈 左边距：可手动调 (例如 6% ~ 10%) */
+  width: 56%;         /* 📐 宽度：控制占青铜板左侧比例，避开右侧圆环 */
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: center; /* 可改为 flex-start (从上排起) 或 center (居中) */
   z-index: 2;
   pointer-events: auto;
 }
