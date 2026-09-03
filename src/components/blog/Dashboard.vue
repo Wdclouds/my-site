@@ -135,7 +135,7 @@
                     <!-- 知识库：纯青铜板图片，零边框，全透明绝对定位条目 (呼应 1 号位自传石碑) -->
                     <template v-else-if="expanded === 'index'">
                       <div class="morph-wire bronze-wire">
-                        <img :src="indexCardImg" alt="青铜法典" class="morph-wire-img" />
+                        <img :src="indexCardImg" alt="青铜法典" class="bronze-modal-img" />
                         <button class="morph-close floating" @click="closeCard" aria-label="关闭">✕</button>
 
                         <div class="bronze-overlay">
@@ -1319,14 +1319,16 @@ const stats = computed(() => {
 .bronze-wire {
   position: relative;
   width: 100%;
+  display: block;
 }
 
-.bronze-wire .morph-wire-img {
+.bronze-modal-img {
   display: block;
   width: 100%;
   height: auto;
   pointer-events: none;
-  filter: drop-shadow(0 25px 60px rgba(0, 0, 0, 0.9));
+  border-radius: 6px;
+  filter: drop-shadow(0 25px 60px rgba(0, 0, 0, 0.95));
 }
 
 .bronze-overlay {
