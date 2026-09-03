@@ -1349,15 +1349,18 @@ const stats = computed(() => {
 
 .bronze-overlay {
   position: absolute;
-  top: 8%;            /* 👆 上边距：可手动调 (例如 6% ~ 12%) */
-  bottom: 8%;         /* 👇 下边距 */
-  left: 7.5%;         /* 👈 左边距：可手动调 (例如 6% ~ 10%) */
-  width: 56%;         /* 📐 宽度：控制占青铜板左侧比例，避开右侧圆环 */
+  top: 20%;           /* 👆 上边距：精准下沉到 20% */
+  bottom: 12%;        /* 👇 底部延伸 */
+  height: 68%;        /* 📐 充足的纵向高度 */
+  left: 7.5%;         /* 👈 左边距 */
+  width: 56%;         /* 📐 宽度 */
   display: flex;
   flex-direction: column;
-  justify-content: center; /* 可改为 flex-start (从上排起) 或 center (居中) */
+  justify-content: flex-start; /* 从上往下自然排布 */
+  gap: 16px;
   z-index: 2;
   pointer-events: auto;
+  overflow-y: auto;   /* 如果内容多支持自然轻量滚动 */
 }
 
 .bronze-overlay .kb-card-list {
