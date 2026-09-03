@@ -132,17 +132,12 @@
             </div>
           </template>
 
-          <!-- 知识库：画廊 -->
-          <template v-else-if="expanded === 'index'">
-            <div class="morph-head">
-              <span class="en">Index</span>
-              <span class="cn">知识画廊</span>
-              <button class="morph-close" @click="closeCard" aria-label="关闭">✕</button>
-            </div>
+          <!-- 知识库：纯粹无界 3D 圆环画廊（无边框、无白底盒子） -->
+          <template v-else-if="expandedCard === 'index'">
+            <button class="morph-close floating" @click="closeCard" aria-label="关闭">✕</button>
             <div class="morph-stage">
               <ReactBridge :component="CircularGallery" :component-props="galleryProps" />
             </div>
-            <p class="morph-tip">滚轮 / 拖拽 / ← → 浏览 · Esc 或 ✕ 关闭</p>
           </template>
 
           <!-- 站台：上面数据，下面 GitHub 贡献热力图 -->
@@ -722,7 +717,19 @@ const stats = computed(() => {
   opacity: 0.95;
   pointer-events: none;
 }
-.morph-panel.index { width: min(1000px, 94vw); height: min(560px, 80vh); }
+.morph-panel.index {
+  width: min(1200px, 96vw);
+  height: min(720px, 88vh);
+  border: none;
+  background: none;
+  box-shadow: none;
+  padding: 0;
+  border-radius: 0;
+}
+.morph-panel.index .morph-stage {
+  border-radius: 0;
+  background: transparent;
+}
 .morph-panel.stats {
   width: min(900px, 94vw);
   height: auto;          /* 高度随内容收缩，不留空白 */
