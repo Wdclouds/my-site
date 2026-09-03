@@ -798,12 +798,21 @@ const stats = computed(() => {
   box-shadow: none !important;
   padding: 0 !important;
   border-radius: 0 !important;
-  height: auto !important;
   overflow: visible !important;
 }
 
 .morph-panel.about {
-  width: min(560px, 88vw) !important;
+  width: min(480px, 90vw) !important;
+  height: min(720px, 86vh) !important;
+  aspect-ratio: 2 / 3;
+}
+
+.morph-panel.about .morph-wire {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  border-radius: 0;
+  background: transparent !important;
 }
 
 .morph-panel.index {
