@@ -152,7 +152,7 @@
                                   <span class="tag-pill tag-num">2 篇</span>
                                 </div>
                               </div>
-                              <p class="kb-row-desc">Nous Research 顶尖开源自主智能体：三级记忆宫殿、工具链自愈调用、多子代理编排（Subagents）与代码执行循环。</p>
+                              
                             </div>
 
                             <!-- 2. Three.js Journey -->
@@ -167,7 +167,7 @@
                                   <span class="tag-pill tag-num">2 篇</span>
                                 </div>
                               </div>
-                              <p class="kb-row-desc">从 WebGL 基础到车舱 3D 全景模型渲染、CanvasTexture 交互与着色器实战体系化梳理。</p>
+                              
                             </div>
 
                             <!-- 3. Cognitive Psychology -->
@@ -182,7 +182,7 @@
                                   <span class="tag-pill tag-num">2 篇</span>
                                 </div>
                               </div>
-                              <p class="kb-row-desc">围绕注意机制、多巴胺回路与心智模型，建立一套可执行的日常精力与习惯管理系统。</p>
+                              
                             </div>
                           </div>
                         </div>
@@ -1349,23 +1349,22 @@ const stats = computed(() => {
 
 .bronze-overlay {
   position: absolute;
-  top: 14%;
-  left: 8%;
-  right: 8%;
+  top: 12%;
+  left: 7%;
+  width: 56%;          /* 缩短长度，避开右侧青铜浮雕圆环 */
   bottom: 12%;
-  z-index: 2;
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
+  justify-content: center;
+  z-index: 2;
+  pointer-events: auto;
 }
 
 .bronze-overlay .kb-card-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  flex: 1;
-  overflow-y: auto;
-  padding-right: 6px;
+  gap: 16px;
+  width: 100%;
 }
 
 .bronze-overlay .kb-card-list::-webkit-scrollbar { width: 4px; }
@@ -1373,15 +1372,15 @@ const stats = computed(() => {
 
 /* 100% 全透明悬浮条目 */
 .bronze-overlay .kb-row-item {
-  padding: 12px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-radius: 6px;
+  border-bottom: 1px solid rgba(212, 163, 89, 0.18);
   background: transparent !important;
-  border: none !important;
-  border-bottom: 1px solid rgba(212, 163, 89, 0.2) !important;
-  border-radius: 0;
-  backdrop-filter: none !important;
-  transition: all 0.2s ease;
   cursor: pointer;
-  text-align: left;
+  transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .bronze-overlay .kb-row-item:last-child {
