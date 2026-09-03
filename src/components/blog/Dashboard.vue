@@ -132,11 +132,16 @@
             </div>
           </template>
 
-          <!-- 知识库：纯粹无界 3D 圆环画廊（无边框、无白底盒子） -->
+          <!-- 知识库：物理阻尼动效卷轴列表 (AnimatedList) -->
           <template v-else-if="expanded === 'index'">
-            <button class="morph-close floating" @click="closeCard" aria-label="关闭">✕</button>
-            <div class="morph-stage gallery-stage">
-              <ReactBridge :component="CircularGallery" :component-props="galleryProps" />
+            <div class="morph-head">
+              <span class="morph-icon">📜</span>
+              <h3 class="morph-title">雅典学宫 · 典籍卷轴</h3>
+              <span class="morph-tag">ACADEMY SCROLLS</span>
+              <button class="morph-close" @click="closeCard" aria-label="关闭">✕</button>
+            </div>
+            <div class="morph-stage list-stage">
+              <ReactBridge :component="AnimatedList" :component-props="animatedListProps" />
             </div>
           </template>
 
@@ -183,7 +188,7 @@ import { ref, computed, watch, nextTick, onBeforeUnmount } from 'vue'
 import gsap from 'gsap'
 import { blogState } from '../../stores/blogState'
 import ReactBridge from '../../components/ReactBridge.vue'
-import { CircularGallery } from '../../react'
+import { AnimatedList } from '../../react'
 
 const props = defineProps({
   showHeatmap: { type: Boolean, default: true },
@@ -204,29 +209,36 @@ const aboutDesignImg = '/img/about-design.png'
 const indexCardImg = '/img/index-card.png'
 const statsCardImg = '/img/stats-card.png'
 
-/* ══════════ 知识库画廊素材（CircularGallery，站内封面） ══════════ */
-const galleryItems = [
-  { image: '/covers/acg/ADAMAS - LiSA.jpg', text: 'ADAMAS' },
-  { image: '/covers/acg/EXCITE - 三浦大知.jpg', text: 'EXCITE' },
-  { image: '/covers/acg/God Knows... - 平野绫.jpg', text: 'God knows...' },
-  { image: '/covers/acg/Life Will Change - Lyn Inaizumi.jpg', text: 'Life Will Change' },
-  { image: '/covers/acg/One Last Kiss - 宇多田光.jpg', text: 'One Last Kiss' },
-  { image: '/covers/acg/only my railgun - fripSide.jpg', text: 'railgun' },
-  { image: '/covers/acg/打上花火 - DAOKO&米津玄师.jpg', text: '打上花火' },
-  { image: '/covers/acg/鳥の詩 - Lia.jpg', text: '鳥の詩' },
-  { image: '/covers/acg/深海少女 - 初音未来.jpg', text: '深海少女' },
-  { image: '/covers/acg/STYX HELIX - MYTH & ROID.jpg', text: 'STYX HELIX' },
-]
-const galleryProps = {
-  items: galleryItems,
-  bend: -6,          // Bend Level
-  textColor: '#F7F2E7',
-  borderRadius: 0.05, // Border Radius
-  font: "bold 26px 'playfair-display-700'", // Font: Playfair Display（本地化，国内可用）
-  fontUrl: '/fonts/playfair-display-700.woff2',
-  scrollSpeed: 1.8,  // Scroll Speed
-  scrollEase: 0.09,  // Scroll Ease
-}
+/* ══════════ 专题知识库动效列表（AnimatedList） ══════════ */
+const animatedListProps = computed(() => {
+  const list = blogState.wikiTopics && blogState.wikiTopics.length > 0
+    ? blogState.wikiTopics
+    : [
+        {
+          title: 'Three.js 3D 全景与交互开发实战',
+          description: '从 WebGL 基础到车舱 3D 全景模型渲染、CanvasTexture 交互与着色器实战体系化梳理。',
+          category: 'dev',
+          article_count: 2
+        },
+        {
+          title: '认知心理学与行为设计手册',
+          description: '围绕注意机制、多巴胺回路与心智模型，建立一套可执行的日常精力与习惯管理系统。',
+          category: 'mind',
+          article_count: 2
+        }
+      ]
+
+  return {
+    items: list,
+    showGradients: true,
+    enableArrowNavigation: true,
+    displayScrollbar: false,
+    initialSelectedIndex: 0,
+    onItemSelect: (item) => {
+      console.log('选中专栏:', item)
+    }
+  }
+})
 
 /* ══════════ 三卡放大弹窗（GSAP 共享布局 FLIP 动效） ══════════ */
 const expanded = ref(null) // 'about' | 'index' | 'stats' | null
@@ -718,23 +730,22 @@ const stats = computed(() => {
   pointer-events: none;
 }
 .morph-panel.index {
-  width: min(1200px, 96vw);
-  height: min(720px, 88vh);
-  border: none;
-  background: none;
-  box-shadow: none;
-  padding: 0;
-  border-radius: 0;
-  position: relative;
+  width: min(720px, 94vw);
+  height: min(600px, 84vh);
+  display: flex;
+  flex-direction: column;
 }
-.morph-panel.index .morph-stage,
-.morph-panel.index .gallery-stage {
+
+.morph-panel.index .list-stage {
+  flex: 1;
   width: 100%;
   height: 100%;
-  border-radius: 0;
-  background: transparent;
+  min-height: 420px;
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .morph-panel.stats {
   width: min(900px, 94vw);
