@@ -184,7 +184,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, nextTick, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import gsap from 'gsap'
 import { blogState } from '../../stores/blogState'
 import ReactBridge from '../../components/ReactBridge.vue'
