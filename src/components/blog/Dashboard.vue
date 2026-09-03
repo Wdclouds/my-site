@@ -830,18 +830,17 @@ const stats = computed(() => {
 
 .bronze-overlay {
   position: absolute;
-  top: 20%;           /* 👆 上边距：精准下沉到 20% */
-  bottom: 12%;        /* 👇 底部延伸 */
-  height: 68%;        /* 📐 充足的纵向高度 */
-  left: 7.5%;         /* 👈 左边距 */
-  width: 56%;         /* 📐 宽度 */
+  top: 20%;
+  left: 7.5%;
+  width: 56%;
+  height: 72%;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* 从上往下自然排布 */
-  gap: 16px;
+  justify-content: space-around;
   z-index: 2;
   pointer-events: auto;
-  overflow-y: auto;   /* 如果内容多支持自然轻量滚动 */
+  overflow: visible !important;
+  scrollbar-width: none !important;
 }
 
 .bronze-overlay .kb-card-list {
@@ -851,8 +850,12 @@ const stats = computed(() => {
   width: 100%;
 }
 
-.bronze-overlay .kb-card-list::-webkit-scrollbar { width: 4px; }
-.bronze-overlay .kb-card-list::-webkit-scrollbar-thumb { background: rgba(212, 163, 89, 0.4); border-radius: 2px; }
+.bronze-overlay::-webkit-scrollbar,
+.bronze-overlay .kb-card-list::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
 
 /* 100% 全透明悬浮条目 */
 .bronze-overlay .kb-row-item {
