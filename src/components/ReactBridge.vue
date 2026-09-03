@@ -46,5 +46,5 @@ watch(
 </script>
 
 <template>
-  <div ref="mountEl"></div>
+  <div ref="mountEl" class="react-bridge-container" style="width: 100%; height: 100%;"></div>
 </template>

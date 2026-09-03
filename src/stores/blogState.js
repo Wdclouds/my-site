@@ -14,6 +14,32 @@ export const blogState = reactive({
   currentTag: 'all',
   posts: [],
   categories: [],
+  wikiTopics: [
+    {
+      id: 1,
+      slug: 'threejs-journey',
+      title: 'Three.js 3D 全景与交互开发实战',
+      description: '从 WebGL 基础到车舱 3D 全景模型渲染、CanvasTexture 交互与着色器实战体系化梳理。',
+      category: 'engineering',
+      article_count: 2
+    },
+    {
+      id: 2,
+      slug: 'cognitive-psychology',
+      title: '认知心理学与行为设计手册',
+      description: '围绕注意机制、多巴胺回路与心智模型，建立一套可执行的日常精力与习惯管理系统。',
+      category: 'thoughts',
+      article_count: 2
+    },
+    {
+      id: 3,
+      slug: 'architecture-mindset',
+      title: '复杂系统架构与设计模式典籍',
+      description: '从解耦思维、单向数据流到全栈同构设计的工程心法与架构演进沉淀。',
+      category: 'architecture',
+      article_count: 3
+    }
+  ],
   isLoading: false,
 })
 
@@ -66,6 +92,18 @@ export async function loadCategories() {
   } catch (err) {}
 }
 
+export async function loadWikiTopics() {
+  try {
+    const res = await fetch('/api/wiki/topics')
+    if (res.ok) {
+      const data = await res.json()
+      if (data.topics && data.topics.length > 0) {
+        blogState.wikiTopics = data.topics
+      }
+    }
+  } catch (err) {}
+}
+
 // ===== Getters ======
 export const filteredPosts = computed(() => {
   const { currentCategory: cat, currentTag: tag, posts } = blogState
@@ -97,4 +135,5 @@ export function initBlog() {
   applyTheme(saved === 'dark' ? 'dark' : 'light')
   loadPosts()
   loadCategories()
+  loadWikiTopics()
 }
