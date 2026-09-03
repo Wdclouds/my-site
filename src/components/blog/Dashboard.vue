@@ -209,7 +209,61 @@ const aboutDesignImg = '/img/about-design.png'
 const indexCardImg = '/img/index-card.png'
 const statsCardImg = '/img/stats-card.png'
 
-/* ══════════ 专题知识库动效列表（AnimatedList） ══════════ */
+
+const selectedTopicIndex = ref(0)
+const wikiScrollList = ref(null)
+
+const wikiTopicsList = computed(() => {
+  const fallback = [
+    {
+      title: "Hermes Agent 架构与自主智能体体系",
+      slug: "hermes-agent",
+      category: "agent",
+      icon: "/icons/nousresearch.svg",
+      article_count: 2,
+      description: "Nous Research 开源顶尖自主智能体 Hermes Agent：从三级记忆宫殿、工具链调用、多智能体协作（Subagents）到真实世界代码执行与系统编排全景实战。"
+    },
+    {
+      title: "Three.js 3D 全景与交互开发实战",
+      slug: "threejs-journey",
+      category: "dev",
+      icon: "Box",
+      article_count: 2,
+      description: "从 WebGL 基础到车舱 3D 全景模型渲染、CanvasTexture 交互与着色器实战体系化梳理。"
+    },
+    {
+      title: "认知心理学与行为设计手册",
+      slug: "cognitive-psychology",
+      category: "mind",
+      icon: "Brain",
+      article_count: 2,
+      description: "围绕注意机制、多巴胺回路与心智模型，建立一套可执行的日常精力与习惯管理系统。"
+    }
+  ]
+  if (blogState.wikiTopics && blogState.wikiTopics.length > 0) {
+    return blogState.wikiTopics
+  }
+  return fallback
+})
+
+function handleTopicKeydown(e) {
+  if (expanded.value !== "index") return
+  if (e.key === "ArrowDown") {
+    e.preventDefault()
+    selectedTopicIndex.value = (selectedTopicIndex.value + 1) % wikiTopicsList.value.length
+  } else if (e.key === "ArrowUp") {
+    e.preventDefault()
+    selectedTopicIndex.value = (selectedTopicIndex.value - 1 + wikiTopicsList.value.length) % wikiTopicsList.value.length
+  }
+}
+
+onMounted(() => {
+  window.addEventListener("keydown", handleTopicKeydown)
+})
+onBeforeUnmount(() => {
+  window.removeEventListener("keydown", handleTopicKeydown)
+})
+
 const animatedListProps = computed(() => {
   const list = blogState.wikiTopics && blogState.wikiTopics.length > 0
     ? blogState.wikiTopics
@@ -1038,3 +1092,114 @@ const stats = computed(() => {
   .kb-list { max-height: 300px; }
 }
 </style>
+
+
+/* ══════════ 原生 AnimatedList 动效列表样式 ══════════ */
+.scroll-list-container {
+  position: relative;
+  width: 100%;
+  max-width: 680px;
+  height: 480px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.scroll-list {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 20px 16px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.scroll-list::-webkit-scrollbar { width: 4px; }
+.scroll-list::-webkit-scrollbar-thumb { background: rgba(212, 163, 89, 0.3); border-radius: 2px; }
+
+.scroll-item {
+  padding: 18px 22px;
+  background: rgba(28, 24, 36, 0.85);
+  border: 1px solid rgba(212, 163, 89, 0.18);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: left;
+  cursor: pointer;
+}
+
+.scroll-item:hover,
+.scroll-item.selected {
+  background: rgba(38, 32, 50, 0.95);
+  border-color: rgba(212, 163, 89, 0.65);
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 12px 32px rgba(212, 163, 89, 0.15), 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.scroll-item-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.scroll-icon { font-size: 16px; }
+.scroll-icon-img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 4px rgba(212, 163, 89, 0.4));
+}
+
+.scroll-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #F7F2E7;
+  margin: 0;
+  flex: 1;
+}
+
+.scroll-cat-badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(212, 163, 89, 0.15);
+  color: #D4A359;
+  border: 1px solid rgba(212, 163, 89, 0.3);
+  text-transform: uppercase;
+}
+
+.scroll-count-badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(99, 102, 241, 0.15);
+  color: #A5B4FC;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.scroll-desc {
+  font-size: 13px;
+  color: #A39E93;
+  margin: 8px 0 0 0;
+  line-height: 1.6;
+}
+
+.scroll-list-fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 40px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.scroll-list-fade.top {
+  top: 0;
+  background: linear-gradient(180deg, rgba(18, 15, 23, 0.95) 0%, transparent 100%);
+}
+
+.scroll-list-fade.bottom {
+  bottom: 0;
+  background: linear-gradient(0deg, rgba(18, 15, 23, 0.95) 0%, transparent 100%);
+}
