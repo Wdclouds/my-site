@@ -133,9 +133,9 @@
           </template>
 
           <!-- 知识库：纯粹无界 3D 圆环画廊（无边框、无白底盒子） -->
-          <template v-else-if="expandedCard === 'index'">
+          <template v-else-if="expanded === 'index'">
             <button class="morph-close floating" @click="closeCard" aria-label="关闭">✕</button>
-            <div class="morph-stage">
+            <div class="morph-stage gallery-stage">
               <ReactBridge :component="CircularGallery" :component-props="galleryProps" />
             </div>
           </template>
@@ -725,10 +725,16 @@ const stats = computed(() => {
   box-shadow: none;
   padding: 0;
   border-radius: 0;
+  position: relative;
 }
-.morph-panel.index .morph-stage {
+.morph-panel.index .morph-stage,
+.morph-panel.index .gallery-stage {
+  width: 100%;
+  height: 100%;
   border-radius: 0;
   background: transparent;
+  position: relative;
+  overflow: hidden;
 }
 .morph-panel.stats {
   width: min(900px, 94vw);
