@@ -1091,8 +1091,6 @@ const stats = computed(() => {
   .dash-grid { grid-template-columns: 1fr; grid-auto-rows: auto; }
   .kb-list { max-height: 300px; }
 }
-</style>
-
 
 /* ══════════ 原生 AnimatedList 动效列表样式 ══════════ */
 .scroll-list-container {
@@ -1203,3 +1201,5 @@ const stats = computed(() => {
   bottom: 0;
   background: linear-gradient(0deg, rgba(18, 15, 23, 0.95) 0%, transparent 100%);
 }
+
+</style>
