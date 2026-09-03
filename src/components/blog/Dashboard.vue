@@ -787,17 +787,29 @@ const stats = computed(() => {
   padding: 20px 24px;
   display: flex;
   flex-direction: column;
-  transform-origin: top left; /* GSAP 从卡片位置放大 */
+  transform-origin: top left;
 }
+
+/* 1 号位自传石碑 & 2 号位青铜法典：零白底、零边框、零阴影大盒子 */
+.morph-panel.about,
+.morph-panel.index {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
 .morph-panel.about {
-  width: min(560px, 88vw);
-  height: min(820px, 90vh);
-  border: none;        /* 无框 */
-  background: none;    /* 无底色 */
-  box-shadow: none;
-  padding: 0;
-  border-radius: 0;
+  width: min(560px, 88vw) !important;
 }
+
+.morph-panel.index {
+  width: min(860px, 92vw) !important;
+}
+
 .morph-close.floating {
   position: absolute;
   top: 14px;
@@ -836,24 +848,7 @@ const stats = computed(() => {
   opacity: 0.95;
   pointer-events: none;
 }
-.morph-panel.index {
-  width: min(720px, 94vw);
-  height: min(600px, 84vh);
-  display: flex;
-  flex-direction: column;
-}
 
-.morph-panel.index .list-stage {
-  flex: 1;
-  width: 100%;
-  height: 100%;
-  min-height: 420px;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 .morph-panel.stats {
   width: min(900px, 94vw);
   height: auto;          /* 高度随内容收缩，不留空白 */
