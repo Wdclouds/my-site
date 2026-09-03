@@ -768,12 +768,13 @@ const stats = computed(() => {
   position: fixed;
   inset: 0;
   z-index: 120;
-  background: rgba(18, 14, 10, 0.38);
-  backdrop-filter: blur(10px);
+  background: rgba(18, 14, 10, 0.45);
+  backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: 16px;
+  overflow: hidden; /* 彻底锁死溢出滚动条 */
 }
 .morph-panel {
   width: min(880px, 92vw);
@@ -793,7 +794,8 @@ const stats = computed(() => {
 /* 1 号位自传石碑 & 2 号位青铜法典：零白底、零边框、零阴影大盒子 */
 .morph-panel.about,
 .morph-panel.index {
-  width: min(980px, 94vw);
+  width: min(920px, 92vw);
+  max-height: min(620px, 86vh);
   background: none !important;
   border: none !important;
   box-shadow: none !important;
@@ -819,6 +821,8 @@ const stats = computed(() => {
 .bronze-modal-img {
   display: block;
   width: 100%;
+  max-height: min(620px, 86vh);
+  object-fit: contain;
   height: auto;
   pointer-events: none;
   filter: drop-shadow(0 20px 50px rgba(0, 0, 0, 0.9));
