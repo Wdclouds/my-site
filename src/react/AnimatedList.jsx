@@ -125,7 +125,11 @@ const AnimatedList = ({
             >
               <div className={`item ${selectedIndex === index ? 'selected' : ''} ${itemClassName}`}>
                 <div className="item-header">
-                  <span className="item-icon">📜</span>
+                  {item.icon && (item.icon.includes('.svg') || item.icon.includes('/')) ? (
+                    <img src={item.icon} alt="" className="item-icon-img" />
+                  ) : (
+                    <span className="item-icon">{item.icon || '📜'}</span>
+                  )}
                   <p className="item-title">{title}</p>
                   {count && <span className="item-badge">{count} 篇</span>}
                 </div>
