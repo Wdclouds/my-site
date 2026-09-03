@@ -132,16 +132,70 @@
             </div>
           </template>
 
-          <!-- 知识库：物理阻尼动效卷轴列表 (AnimatedList) -->
+                    <!-- 知识库：纯原生 Vue 种子条目 + 古典底图 -->
           <template v-else-if="expanded === 'index'">
-            <div class="morph-head">
-              <span class="morph-icon">📜</span>
-              <h3 class="morph-title">雅典学宫 · 典籍卷轴</h3>
-              <span class="morph-tag">ACADEMY SCROLLS</span>
-              <button class="morph-close" @click="closeCard" aria-label="关闭">✕</button>
-            </div>
-            <div class="morph-stage list-stage">
-              <ReactBridge :component="AnimatedList" :component-props="animatedListProps" />
+            <div class="morph-kb-box">
+              <img :src="indexCardImg" alt="" class="kb-bg-art" />
+              
+              <div class="kb-content-layer">
+                <div class="morph-head">
+                  <span class="morph-icon">📜</span>
+                  <h3 class="morph-title">雅典学宫 · 典籍卷轴</h3>
+                  <span class="morph-tag">ACADEMY SCROLLS</span>
+                  <button class="morph-close" @click="closeCard" aria-label="关闭">✕</button>
+                </div>
+
+                <div class="kb-card-list">
+                  <!-- 1. Hermes Agent -->
+                  <div class="kb-row-item" :class="{ active: selectedTopicIndex === 0 }" @mouseenter="selectedTopicIndex = 0">
+                    <div class="kb-row-head">
+                      <div class="kb-row-title-wrap">
+                        <img src="/icons/nousresearch.svg" alt="" class="kb-logo-svg" />
+                        <span class="kb-row-title">Hermes Agent 架构与自主智能体体系</span>
+                      </div>
+                      <div class="kb-row-tags">
+                        <span class="tag-pill tag-agent">AGENT</span>
+                        <span class="tag-pill tag-num">2 篇</span>
+                      </div>
+                    </div>
+                    <p class="kb-row-desc">Nous Research 顶尖开源自主智能体：三级记忆宫殿、工具链自愈调用、多子代理编排（Subagents）与真实世界代码执行循环体系。</p>
+                  </div>
+
+                  <!-- 2. Three.js Journey -->
+                  <div class="kb-row-item" :class="{ active: selectedTopicIndex === 1 }" @mouseenter="selectedTopicIndex = 1">
+                    <div class="kb-row-head">
+                      <div class="kb-row-title-wrap">
+                        <span class="kb-emoji-icon">📦</span>
+                        <span class="kb-row-title">Three.js 3D 全景与交互开发实战</span>
+                      </div>
+                      <div class="kb-row-tags">
+                        <span class="tag-pill tag-dev">DEV</span>
+                        <span class="tag-pill tag-num">2 篇</span>
+                      </div>
+                    </div>
+                    <p class="kb-row-desc">从 WebGL 基础到车舱 3D 全景模型渲染、CanvasTexture 交互与着色器实战体系化梳理。</p>
+                  </div>
+
+                  <!-- 3. Cognitive Psychology -->
+                  <div class="kb-row-item" :class="{ active: selectedTopicIndex === 2 }" @mouseenter="selectedTopicIndex = 2">
+                    <div class="kb-row-head">
+                      <div class="kb-row-title-wrap">
+                        <span class="kb-emoji-icon">🧠</span>
+                        <span class="kb-row-title">认知心理学与行为设计手册</span>
+                      </div>
+                      <div class="kb-row-tags">
+                        <span class="tag-pill tag-mind">MIND</span>
+                        <span class="tag-pill tag-num">2 篇</span>
+                      </div>
+                    </div>
+                    <p class="kb-row-desc">围绕注意机制、多巴胺回路与心智模型，建立一套可执行的日常精力与习惯管理系统。</p>
+                  </div>
+                </div>
+
+                <div class="kb-hint-bar">
+                  <span>✦ 键盘 ↑ / ↓ 键可顺滑切换选中专栏</span>
+                </div>
+              </div>
             </div>
           </template>
 
@@ -1259,6 +1313,167 @@ const stats = computed(() => {
 
 .kb-footer-hint {
   padding-top: 14px;
+  font-size: 11px;
+  color: #8C867A;
+  text-align: right;
+  letter-spacing: 1px;
+}
+
+
+/* ══════════ 知识库弹窗：原生半透明底图 + 种子条目精雕样式 ══════════ */
+.morph-panel.index {
+  width: min(900px, 94vw);
+  max-height: 88vh;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.morph-kb-box {
+  position: relative;
+  width: 100%;
+  min-height: 520px;
+  background: rgba(24, 20, 30, 0.88);
+  border: 1px solid rgba(212, 163, 89, 0.4);
+  border-radius: 16px;
+  backdrop-filter: blur(24px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(212, 163, 89, 0.15);
+  overflow: hidden;
+}
+
+.kb-bg-art {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.15;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+.kb-content-layer {
+  position: relative;
+  z-index: 2;
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.kb-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 8px;
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.kb-card-list::-webkit-scrollbar { width: 5px; }
+.kb-card-list::-webkit-scrollbar-thumb { background: rgba(212, 163, 89, 0.4); border-radius: 3px; }
+
+.kb-row-item {
+  padding: 20px 24px;
+  background: rgba(36, 30, 48, 0.75);
+  border: 1px solid rgba(212, 163, 89, 0.22);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  text-align: left;
+}
+
+.kb-row-item:hover,
+.kb-row-item.active {
+  background: rgba(56, 46, 76, 0.95);
+  border-color: rgba(212, 163, 89, 0.85);
+  transform: translateY(-2px) scale(1.008);
+  box-shadow: 0 12px 28px rgba(212, 163, 89, 0.2), 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.kb-row-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.kb-row-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.kb-logo-svg {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px rgba(212, 163, 89, 0.7));
+}
+
+.kb-emoji-icon {
+  font-size: 18px;
+}
+
+.kb-row-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #F7F2E7;
+}
+
+.kb-row-tags {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tag-pill {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tag-agent {
+  background: rgba(212, 163, 89, 0.2);
+  color: #F3CA85;
+  border: 1px solid rgba(212, 163, 89, 0.4);
+}
+
+.tag-dev {
+  background: rgba(59, 130, 246, 0.2);
+  color: #93C5FD;
+  border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+.tag-mind {
+  background: rgba(168, 85, 247, 0.2);
+  color: #D8B4FE;
+  border: 1px solid rgba(168, 85, 247, 0.4);
+}
+
+.tag-num {
+  background: rgba(255, 255, 255, 0.08);
+  color: #D1D5DB;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.kb-row-desc {
+  font-size: 13px;
+  color: #C5BFB2;
+  line-height: 1.65;
+  margin: 0;
+}
+
+.kb-hint-bar {
+  padding-top: 16px;
   font-size: 11px;
   color: #8C867A;
   text-align: right;
