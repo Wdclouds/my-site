@@ -260,7 +260,7 @@ const ghChartUrl = 'https://ghchart.rshah.org/7A583A/' + GITHUB_USER
 
 /* ══════════ 卡片图片 ══════════ */
 const aboutDesignImg = '/img/about-design.png'
-const indexCardImg = '/img/index-card.png'
+const indexCardImg = '/img/bronze-tablet.png'
 const statsCardImg = '/img/stats-card.png'
 
 
@@ -1322,25 +1322,23 @@ const stats = computed(() => {
 
 /* ══════════ 知识库弹窗：原生半透明底图 + 种子条目精雕样式 ══════════ */
 .morph-panel.index {
-  width: min(900px, 94vw);
-  max-height: 88vh;
+  width: min(840px, 92vw);
+  height: min(560px, 78vh);
   background: transparent;
   border: none;
   box-shadow: none;
   padding: 0;
   border-radius: 16px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .morph-kb-box {
   position: relative;
   width: 100%;
-  min-height: 520px;
-  background: rgba(24, 20, 30, 0.88);
-  border: 1px solid rgba(212, 163, 89, 0.4);
+  height: 100%;
   border-radius: 16px;
-  backdrop-filter: blur(24px);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(212, 163, 89, 0.15);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.85), 0 0 40px rgba(212, 163, 89, 0.25);
+  border: 1px solid rgba(212, 163, 89, 0.45);
   overflow: hidden;
 }
 
@@ -1351,9 +1349,8 @@ const stats = computed(() => {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.15;
-  mix-blend-mode: overlay;
   pointer-events: none;
+  filter: brightness(0.7) contrast(1.1);
 }
 
 .kb-content-layer {
