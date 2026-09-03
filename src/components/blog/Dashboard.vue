@@ -215,15 +215,24 @@ const animatedListProps = computed(() => {
     ? blogState.wikiTopics
     : [
         {
+          title: 'Hermes Agent 架构与自主智能体体系',
+          description: 'Nous Research 顶尖自主智能体框架实战：三级记忆宫殿、工具链编排与自动化闭环。',
+          category: 'agent',
+          icon: '/icons/nousresearch.svg',
+          article_count: 2
+        },
+        {
           title: 'Three.js 3D 全景与交互开发实战',
           description: '从 WebGL 基础到车舱 3D 全景模型渲染、CanvasTexture 交互与着色器实战体系化梳理。',
           category: 'dev',
+          icon: 'Box',
           article_count: 2
         },
         {
           title: '认知心理学与行为设计手册',
           description: '围绕注意机制、多巴胺回路与心智模型，建立一套可执行的日常精力与习惯管理系统。',
           category: 'mind',
+          icon: 'Brain',
           article_count: 2
         }
       ]

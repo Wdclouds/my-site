@@ -3,17 +3,14 @@ import { motion, useInView } from 'motion/react';
 import './AnimatedList.css';
 
 const AnimatedItem = ({ children, delay = 0, index, onMouseEnter, onClick }) => {
-  const ref = useRef(null);
-  const inView = useInView(ref, { amount: 0.3, triggerOnce: false });
   return (
     <motion.div
-      ref={ref}
       data-index={index}
       onMouseEnter={onMouseEnter}
       onClick={onClick}
-      initial={{ scale: 0.85, opacity: 0, y: 15 }}
-      animate={inView ? { scale: 1, opacity: 1, y: 0 } : { scale: 0.85, opacity: 0, y: 15 }}
-      transition={{ duration: 0.25, delay }}
+      initial={{ scale: 0.92, opacity: 0, y: 12 }}
+      animate={{ scale: 1, opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: Math.min(delay, 0.3), ease: [0.25, 1, 0.5, 1] }}
       style={{ marginBottom: '0.85rem', cursor: 'pointer' }}
     >
       {children}
