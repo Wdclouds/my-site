@@ -1092,72 +1092,146 @@ const stats = computed(() => {
   .kb-list { max-height: 300px; }
 }
 
-/* ══════════ 原生 AnimatedList 动效列表样式 ══════════ */
-.scroll-list-container {
-  position: relative;
-  width: 100%;
-  max-width: 680px;
-  height: 480px;
-  margin: 0 auto;
+/* ══════════ 知识库：古典底图 + 半透明条目样式 ══════════ */
+.morph-panel.index {
+  width: min(880px, 94vw);
+  max-height: 88vh;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  border-radius: 16px;
   overflow: hidden;
 }
 
-.scroll-list {
+.morph-kb-wrapper {
+  position: relative;
   width: 100%;
-  height: 100%;
-  overflow-y: auto;
-  padding: 20px 16px 40px;
+  min-height: 540px;
+  background: rgba(22, 19, 29, 0.88);
+  border: 1px solid rgba(212, 163, 89, 0.35);
+  border-radius: 16px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(212, 163, 89, 0.12);
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 14px;
 }
 
-.scroll-list::-webkit-scrollbar { width: 4px; }
-.scroll-list::-webkit-scrollbar-thumb { background: rgba(212, 163, 89, 0.3); border-radius: 2px; }
+.kb-bg-texture {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.18;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
 
-.scroll-item {
-  padding: 18px 22px;
-  background: rgba(28, 24, 36, 0.85);
-  border: 1px solid rgba(212, 163, 89, 0.18);
+.kb-inner-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 28px 32px;
+}
+
+.kb-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(212, 163, 89, 0.2);
+  margin-bottom: 20px;
+}
+
+.kb-head-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #F7F2E7;
+  letter-spacing: 1px;
+}
+
+.kb-head-sub {
+  font-size: 12px;
+  color: #D4A359;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.kb-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-right: 6px;
+  max-height: 400px;
+}
+
+.kb-scroll-area::-webkit-scrollbar { width: 5px; }
+.kb-scroll-area::-webkit-scrollbar-thumb { background: rgba(212, 163, 89, 0.35); border-radius: 3px; }
+
+.kb-item-card {
+  padding: 20px 24px;
+  background: rgba(32, 27, 42, 0.7);
+  border: 1px solid rgba(212, 163, 89, 0.2);
   border-radius: 12px;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(10px);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  text-align: left;
   cursor: pointer;
+  text-align: left;
 }
 
-.scroll-item:hover,
-.scroll-item.selected {
-  background: rgba(38, 32, 50, 0.95);
-  border-color: rgba(212, 163, 89, 0.65);
-  transform: translateY(-2px) scale(1.01);
-  box-shadow: 0 12px 32px rgba(212, 163, 89, 0.15), 0 4px 12px rgba(0, 0, 0, 0.4);
+.kb-item-card:hover,
+.kb-item-card.selected {
+  background: rgba(48, 40, 64, 0.9);
+  border-color: rgba(212, 163, 89, 0.8);
+  transform: translateY(-2px) scale(1.008);
+  box-shadow: 0 12px 30px rgba(212, 163, 89, 0.15), 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.scroll-item-head {
+.kb-item-top {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }
 
-.scroll-icon { font-size: 16px; }
-.scroll-icon-img {
-  width: 20px;
-  height: 20px;
+.kb-item-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.kb-icon-img {
+  width: 24px;
+  height: 24px;
   object-fit: contain;
-  filter: drop-shadow(0 0 4px rgba(212, 163, 89, 0.4));
+  filter: drop-shadow(0 0 6px rgba(212, 163, 89, 0.6));
 }
 
-.scroll-title {
+.kb-icon-emoji {
+  font-size: 18px;
+}
+
+.kb-item-name {
   font-size: 16px;
   font-weight: 600;
   color: #F7F2E7;
   margin: 0;
-  flex: 1;
 }
 
-.scroll-cat-badge {
+.kb-item-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kb-cat-tag {
   font-size: 11px;
   padding: 2px 8px;
   border-radius: 10px;
@@ -1167,7 +1241,7 @@ const stats = computed(() => {
   text-transform: uppercase;
 }
 
-.scroll-count-badge {
+.kb-count-tag {
   font-size: 11px;
   padding: 2px 8px;
   border-radius: 10px;
@@ -1176,30 +1250,19 @@ const stats = computed(() => {
   border: 1px solid rgba(99, 102, 241, 0.3);
 }
 
-.scroll-desc {
+.kb-item-desc {
   font-size: 13px;
-  color: #A39E93;
-  margin: 8px 0 0 0;
-  line-height: 1.6;
+  color: #B3ADA0;
+  line-height: 1.65;
+  margin: 0;
 }
 
-.scroll-list-fade {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 40px;
-  pointer-events: none;
-  z-index: 2;
-}
-
-.scroll-list-fade.top {
-  top: 0;
-  background: linear-gradient(180deg, rgba(18, 15, 23, 0.95) 0%, transparent 100%);
-}
-
-.scroll-list-fade.bottom {
-  bottom: 0;
-  background: linear-gradient(0deg, rgba(18, 15, 23, 0.95) 0%, transparent 100%);
+.kb-footer-hint {
+  padding-top: 14px;
+  font-size: 11px;
+  color: #8C867A;
+  text-align: right;
+  letter-spacing: 1px;
 }
 
 </style>
